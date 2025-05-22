@@ -27,8 +27,8 @@ import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 @Composable
 fun MainMenuView(
     onPlayClicked: () -> Unit,
-    //onHighlightsClicked() -> Unit,
-    //onCreditsClicked() -> Unit,
+    onHighlightsClicked: () -> Unit,
+    onCreditsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val buttonTextColor = MaterialTheme.colorScheme.onPrimary
@@ -61,10 +61,7 @@ fun MainMenuView(
             }
             Spacer (modifier = Modifier.height(3.dp))
             Button(
-                onClick = {
-                    Log.d("MainMenuView", "Highlights button clicked")
-                },
-                //onClick = onHighlightsClicked,
+                onClick = onHighlightsClicked,
                 modifier = Modifier.widthIn(min = 200.dp),
                 colors = ButtonDefaults.buttonColors(contentColor = buttonTextColor)
             ){
@@ -72,10 +69,7 @@ fun MainMenuView(
             }
             Spacer (modifier = Modifier.height(3.dp))
             Button(
-                onClick = {
-                    Log.d("MainMenuView", "Credits button clicked")
-                },
-                //onClick = onCreditsClicked,
+                onClick = onCreditsClicked,
                 modifier = Modifier.widthIn(min = 200.dp),
                 colors = ButtonDefaults.buttonColors(contentColor = buttonTextColor)
             ){
@@ -91,6 +85,6 @@ fun MainMenuView(
 @Composable
 fun GreetingPreview() {
     SimonKotlordsTheme {
-        MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")})
+        MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
     }
 }
