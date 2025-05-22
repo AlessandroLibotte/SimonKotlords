@@ -3,8 +3,6 @@ package com.example.simon_kotlords.ui.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,34 +13,21 @@ import androidx.compose.ui.unit.dp
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-fun CreditsView(onNavigateBack: () -> Unit,
-                modifier: Modifier = Modifier
-){
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Credits") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
-            )
-        },
-        modifier = modifier
-    ){ innerPadding ->
+fun CreditsView(modifier: Modifier = Modifier){
+
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color= MaterialTheme.colorScheme.background
+    ) {
+
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
+        ) {
+
             Text(
                 text = "Game Developed by Kotlords",
                 style = MaterialTheme.typography.headlineMedium,
@@ -50,13 +35,13 @@ fun CreditsView(onNavigateBack: () -> Unit,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Kotlords are a small team of scared progammers",
+                text = "Kotlords are a small team of scared progammers.",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "so their will is to remain anounimous",
+                text = "Their will is to remain anounimous",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
@@ -67,7 +52,7 @@ fun CreditsView(onNavigateBack: () -> Unit,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
             )
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             CreditCategory("Sviluppo")
             CreditItem("First KotLord")
@@ -122,6 +107,6 @@ fun CreditItem(name: String) {
 @Composable
 fun CreditsScreenPreview() {
     SimonKotlordsTheme {
-        CreditsView(onNavigateBack = {})
+        CreditsView()
     }
 }

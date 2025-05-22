@@ -16,3 +16,8 @@ val DarkPrimary = Color(0xFFBB86FC)
 val DarkSecondary = Color(0xFF03DAC5)
 val DarkOnBackground = Color.White
 val DarkOnSurface = Color.White
+
+val SimonRed = Color(0xFFEB4751)
+val SimonGreen = Color(0xFF49AF76)
+val SimonBlue = Color(0xFF4490CA)
+val SimonYellow = Color(0xFFF9D14A)
