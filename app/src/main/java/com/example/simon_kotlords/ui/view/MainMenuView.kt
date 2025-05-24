@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -31,50 +29,71 @@ fun MainMenuView(
     onCreditsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val buttonTextColor = MaterialTheme.colorScheme.onPrimary
-    Surface(modifier = modifier.fillMaxSize(),
-    color= MaterialTheme.colorScheme.background){
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally) {
+
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color= MaterialTheme.colorScheme.background
+    ){
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
                 Text(
                     text = "Simon",
                     style = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
+
                 Text(
                     text = "by Kotlords",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
             }
-            Spacer (modifier = Modifier.height(40.dp))
-            Image(painter = painterResource(id = R.drawable.game_logo_purple),
+
+            Image(
+                painter = painterResource(id = R.drawable.game_logo_purple),
                 contentDescription = "Logo",
-                modifier = Modifier.size(250.dp))
-            Spacer (modifier = Modifier.height(40.dp))
-            Button(
-                onClick = onPlayClicked,
-                modifier = Modifier.widthIn(min = 200.dp),
-                colors = ButtonDefaults.buttonColors(contentColor = buttonTextColor)
-            ){
-                Text(text = "Play")
+                modifier = Modifier.size(360.dp)
+            )
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                Button(
+                    onClick = onPlayClicked,
+                    modifier = Modifier.widthIn(min = 200.dp),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                ) {
+                    Text(text = "Play")
+                }
+
+                Button(
+                    onClick = onHighlightsClicked,
+                    modifier = Modifier.widthIn(min = 200.dp),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                ) {
+                    Text(text = "Leaderboard")
+                }
+
+                Button(
+                    onClick = onCreditsClicked,
+                    modifier = Modifier.widthIn(min = 200.dp),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                ) {
+                    Text(text = "Credits")
+                }
             }
-            Spacer (modifier = Modifier.height(3.dp))
-            Button(
-                onClick = onHighlightsClicked,
-                modifier = Modifier.widthIn(min = 200.dp),
-                colors = ButtonDefaults.buttonColors(contentColor = buttonTextColor)
-            ){
-                Text(text = "Highlights")
-            }
-            Spacer (modifier = Modifier.height(3.dp))
-            Button(
-                onClick = onCreditsClicked,
-                modifier = Modifier.widthIn(min = 200.dp),
-                colors = ButtonDefaults.buttonColors(contentColor = buttonTextColor)
-            ){
-                Text(text = "Credits")
-            }
+
         }
     }
 }
