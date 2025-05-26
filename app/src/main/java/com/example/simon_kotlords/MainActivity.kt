@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +53,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun Content() {
 
@@ -62,14 +65,29 @@ fun Content() {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBar(currentRoute, navController)
-        }
+        },
+
     ) { innerPadding ->
 
         NavHost(
             navController = navController,
             startDestination = AppDestinations.MAIN_MENU_ROUTE,
         ) {
-            composable(AppDestinations.MAIN_MENU_ROUTE) {
+            composable(
+                AppDestinations.MAIN_MENU_ROUTE,
+                enterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Down, animationSpec = tween(300))
+                },
+                exitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, animationSpec = tween(300))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Down, animationSpec = tween(300))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, animationSpec = tween(300))
+                }
+            ) {
                 MainMenuView(
                     onPlayClicked = { navController.navigate(AppDestinations.PLAY_GAME_ROUTE) },
                     onHighlightsClicked = { navController.navigate(AppDestinations.LEADERBOARD_ROUTE) },
@@ -78,9 +96,27 @@ fun Content() {
                 )
             }
 
-            composable(AppDestinations.PLAY_GAME_ROUTE) { GameView() }
-            composable(AppDestinations.LEADERBOARD_ROUTE) { HighlightsView(Modifier.padding(innerPadding)) }
-            composable(AppDestinations.CREDITS_ROUTE) { CreditsView(Modifier.padding(innerPadding)) }
+            composable(
+                AppDestinations.PLAY_GAME_ROUTE,
+                enterTransition = null,
+                exitTransition = null,
+                popEnterTransition = null,
+                popExitTransition = null
+            ) { GameView() }
+            composable(
+                AppDestinations.LEADERBOARD_ROUTE,
+                enterTransition = null,
+                exitTransition = null,
+                popEnterTransition = null,
+                popExitTransition = null
+            ) { HighlightsView(Modifier.padding(innerPadding)) }
+            composable(
+                AppDestinations.CREDITS_ROUTE,
+                enterTransition = null,
+                exitTransition = null,
+                popEnterTransition = null,
+                popExitTransition = null
+            ) { CreditsView(Modifier.padding(innerPadding)) }
 
         }
 
@@ -96,6 +132,7 @@ fun TopBar(currentRoute: String?, navController: NavHostController) {
         else -> {
 
             Row(
+                modifier = Modifier.padding(top=16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -138,9 +175,17 @@ fun TopBar(currentRoute: String?, navController: NavHostController) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Dark Theme", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun GreetingPreview() {
+fun GreetingPreviewDark() {
+    SimonKotlordsTheme {
+        Content()
+    }
+}
+
+@Preview(name = "Light Theme", showBackground = true)
+@Composable
+fun GreetingPreviewLight() {
     SimonKotlordsTheme {
         Content()
     }
