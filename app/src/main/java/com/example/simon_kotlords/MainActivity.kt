@@ -1,5 +1,6 @@
 package com.example.simon_kotlords
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -109,7 +110,8 @@ fun Content() {
                 exitTransition = null,
                 popEnterTransition = null,
                 popExitTransition = null
-            ) { HighlightsView(Modifier.padding(innerPadding)) }
+            ) { HighlightsView(
+                Modifier.padding(innerPadding),) }
             composable(
                 AppDestinations.CREDITS_ROUTE,
                 enterTransition = null,
@@ -175,7 +177,7 @@ fun TopBar(currentRoute: String?, navController: NavHostController) {
     }
 }
 
-@Preview(name = "Dark Theme", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Dark Theme", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun GreetingPreviewDark() {
     SimonKotlordsTheme {
