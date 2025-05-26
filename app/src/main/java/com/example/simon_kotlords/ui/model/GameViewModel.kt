@@ -16,6 +16,15 @@ class GameViewModel(application: Application) : AndroidViewModel(application){
     private val _inputSequence = MutableLiveData<List<Int>>()
     val inputSequence: LiveData<List<Int>> = _inputSequence
 
+    private val _level = MutableLiveData<Int>()
+    val level: LiveData<Int> = _level
+
+    private val _score = MutableLiveData<Int>()
+    val score: LiveData<Int> = _score
+
+    private val _gameOver = MutableLiveData<Boolean>()
+    val gameOver: LiveData<Boolean> = _gameOver
+
     private val _redActive = MutableLiveData<Boolean>()
     val redActive: LiveData<Boolean> = _redActive
 
@@ -31,9 +40,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application){
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
-
     init {
         updateSequence()
+        playSequence()
     }
 
     fun updateSequence() {
@@ -49,10 +58,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application){
         if(inputSequence.value!![inputSequence.value!!.lastIndex] != sequence.value!![inputSequence.value!!.lastIndex]) {
             _sequence.value = emptyList()
             _inputSequence.value = emptyList()
+            _gameOver.value = true
             return
         }
 
+        _score.value = (score.value ?: 0) + 1
+
         if (inputSequence.value!!.size == sequence.value!!.size) {
+            _level.value = (level.value ?: 0) + 1
             updateSequence()
             playSequence()
             _inputSequence.value = emptyList()

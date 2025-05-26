@@ -52,6 +52,10 @@ fun GameView(
     val isPlaying = gameViewModel.isPlaying.observeAsState(false)
 
     val sequence = gameViewModel.sequence.observeAsState(emptyList())
+    val inputSequence = gameViewModel.inputSequence.observeAsState(emptyList())
+    val gameOver = gameViewModel.gameOver.observeAsState(false)
+    val level = gameViewModel.level.observeAsState(1)
+    val score = gameViewModel.score.observeAsState(0)
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -92,30 +96,55 @@ fun GameView(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        ArcButton(SimonRed, 180f, 90f, 35.dp, 35.dp, redActive.value, !isPlaying.value, gameViewModel::redPressed)
+                        ArcButton(SimonRed, 180f, 90f, 35.dp, 35.dp,
+                            redActive.value, !isPlaying.value, gameViewModel::redPressed)
 
-                        ArcButton(SimonGreen, 270f, 90f, (-65).dp, 35.dp, greenActive.value, !isPlaying.value, gameViewModel::greenPressed)
+                        ArcButton(SimonGreen, 270f, 90f, (-65).dp, 35.dp,
+                            greenActive.value, !isPlaying.value, gameViewModel::greenPressed)
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        ArcButton(SimonYellow, 90f, 90f, 35.dp, (-65).dp, yellowActive.value, !isPlaying.value, gameViewModel::yellowPressed)
+                        ArcButton(SimonYellow, 90f, 90f, 35.dp, (-65).dp,
+                            yellowActive.value, !isPlaying.value, gameViewModel::yellowPressed)
 
-                        ArcButton(SimonBlue, 0f, 90f, (-65).dp, (-65).dp, blueActive.value, !isPlaying.value, gameViewModel::bluePressed)
-
+                        ArcButton(SimonBlue, 0f, 90f, (-65).dp, (-65).dp,
+                            blueActive.value, !isPlaying.value, gameViewModel::bluePressed)
                     }
 
 
                 }
             }
 
-            Text(
-                "Livello 1 ${sequence.value}",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+            if(gameOver.value) {
+                Text(
+                    "Game Over",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+            }
+
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+                Text(
+                    "Livello ${level.value}",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    "Score: ${score.value}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+            }
 
         }
     }
