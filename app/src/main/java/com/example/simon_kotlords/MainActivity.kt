@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 import com.example.simon_kotlords.ui.view.CreditsView
 import com.example.simon_kotlords.ui.view.GameView
-import com.example.simon_kotlords.ui.view.HighlightsView
+import com.example.simon_kotlords.ui.view.LeaderBoardView
 import com.example.simon_kotlords.ui.view.MainMenuView
 
 object AppDestinations {
@@ -66,8 +66,7 @@ fun Content() {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopBar(currentRoute, navController)
-        },
-
+        }
     ) { innerPadding ->
 
         NavHost(
@@ -110,8 +109,7 @@ fun Content() {
                 exitTransition = null,
                 popEnterTransition = null,
                 popExitTransition = null
-            ) { HighlightsView(
-                Modifier.padding(innerPadding),) }
+            ) { LeaderBoardView(Modifier.padding(innerPadding)) }
             composable(
                 AppDestinations.CREDITS_ROUTE,
                 enterTransition = null,
