@@ -56,21 +56,30 @@ class GameViewModel(application: Application) : AndroidViewModel(application){
         if (inputSequence.value.isNullOrEmpty() || sequence.value.isNullOrEmpty()) return
 
         if(inputSequence.value!![inputSequence.value!!.lastIndex] != sequence.value!![inputSequence.value!!.lastIndex]) {
-            _sequence.value = emptyList()
-            _inputSequence.value = emptyList()
-            _gameOver.value = true
+            gameOver()
             return
         }
 
         _score.value = (score.value ?: 0) + 1
 
         if (inputSequence.value!!.size == sequence.value!!.size) {
-            _level.value = (level.value ?: 0) + 1
-            updateSequence()
-            playSequence()
-            _inputSequence.value = emptyList()
+            nexLevel()
         }
 
+    }
+
+    fun gameOver(){
+        _sequence.value = emptyList()
+        _inputSequence.value = emptyList()
+        _gameOver.value = true
+
+    }
+
+    fun nexLevel(){
+        _level.value = (level.value ?: 0) + 1
+        updateSequence()
+        playSequence()
+        _inputSequence.value = emptyList()
     }
 
     fun redPressed()
