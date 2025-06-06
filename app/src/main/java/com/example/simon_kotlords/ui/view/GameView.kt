@@ -27,22 +27,20 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.simon_kotlords.R
 import com.example.simon_kotlords.ui.model.GameViewModel
-import com.example.simon_kotlords.ui.theme.SimonBlue
-import com.example.simon_kotlords.ui.theme.SimonGreen
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
-import com.example.simon_kotlords.ui.theme.SimonRed
-import com.example.simon_kotlords.ui.theme.SimonYellow
 
 @Composable
 fun GameView(
     modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = viewModel()
+    gameViewModel: GameViewModel = hiltViewModel()
 ){
 
     val redActive = gameViewModel.redActive.observeAsState(false)
@@ -96,10 +94,11 @@ fun GameView(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        ArcButton(SimonRed, 180f, 90f, 35.dp, 35.dp,
+
+                        ArcButton(painterResource(id = R.drawable.red),
                             redActive.value, !isPlaying.value, gameViewModel::redPressed)
 
-                        ArcButton(SimonGreen, 270f, 90f, (-65).dp, 35.dp,
+                        ArcButton(painterResource(id = R.drawable.bluee),
                             greenActive.value, !isPlaying.value, gameViewModel::greenPressed)
                     }
 
@@ -107,10 +106,10 @@ fun GameView(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        ArcButton(SimonYellow, 90f, 90f, 35.dp, (-65).dp,
+                        ArcButton(painterResource(id = R.drawable.yellow),
                             yellowActive.value, !isPlaying.value, gameViewModel::yellowPressed)
 
-                        ArcButton(SimonBlue, 0f, 90f, (-65).dp, (-65).dp,
+                        ArcButton(painterResource(id = R.drawable.green),
                             blueActive.value, !isPlaying.value, gameViewModel::bluePressed)
                     }
 
@@ -152,7 +151,7 @@ fun GameView(
 }
 
 @Composable
-fun ArcButton(
+fun ArcButtonCanvas(
     color: Color,
     startAngle: Float,
     sweepAngle: Float,
@@ -197,6 +196,38 @@ fun ArcButton(
             topLeft = Offset(offsetX.toPx(), offsetY.toPx()),
             style = Stroke(width = 55.dp.toPx()),
 
+        )
+    }
+
+}
+
+@Composable
+fun ArcButton(
+    image: Painter,
+    isActive: Boolean,
+    enable: Boolean,
+    onClick: () -> Unit,
+){
+
+    val interactionSource = remember { MutableInteractionSource()}
+
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    Box(
+        modifier = Modifier
+            .size(125.dp)
+            .clickable(
+                enabled = enable,
+                interactionSource = interactionSource,
+                onClick = onClick,
+                indication = null
+            ),
+        contentAlignment = Alignment.Center
+    ){
+        Image(
+            painter = image,
+            contentDescription = "Arc",
+            colorFilter = ColorFilter.tint(Color.White.copy(alpha = if (isPressed || isActive) 0.4f else 0f))
         )
     }
 

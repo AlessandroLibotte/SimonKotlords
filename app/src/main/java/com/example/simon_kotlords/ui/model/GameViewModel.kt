@@ -1,14 +1,18 @@
 package com.example.simon_kotlords.ui.model
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.simon_kotlords.data.repository.LeaderBoardRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import javax.inject.Inject
 
-class GameViewModel(application: Application) : AndroidViewModel(application){
+@HiltViewModel
+class GameViewModel @Inject constructor( private val repository: LeaderBoardRepository) : ViewModel(){
 
     private val _sequence = MutableLiveData<List<Int>>()
     val sequence: LiveData<List<Int>> = _sequence
@@ -56,21 +60,32 @@ class GameViewModel(application: Application) : AndroidViewModel(application){
         if (inputSequence.value.isNullOrEmpty() || sequence.value.isNullOrEmpty()) return
 
         if(inputSequence.value!![inputSequence.value!!.lastIndex] != sequence.value!![inputSequence.value!!.lastIndex]) {
-            _sequence.value = emptyList()
-            _inputSequence.value = emptyList()
-            _gameOver.value = true
+            gameOver()
             return
         }
 
         _score.value = (score.value ?: 0) + 1
 
         if (inputSequence.value!!.size == sequence.value!!.size) {
-            _level.value = (level.value ?: 0) + 1
-            updateSequence()
-            playSequence()
-            _inputSequence.value = emptyList()
+            nexLevel()
         }
 
+    }
+
+    fun gameOver(){
+        _sequence.value = emptyList()
+        _inputSequence.value = emptyList()
+        _gameOver.value = true
+
+        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
+
+    }
+
+    fun nexLevel(){
+        _level.value = (level.value ?: 0) + 1
+        updateSequence()
+        playSequence()
+        _inputSequence.value = emptyList()
     }
 
     fun redPressed()
