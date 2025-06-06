@@ -1,48 +1,25 @@
 package com.example.simon_kotlords.ui.model
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.simon_kotlords.ui.entity.HighScoreEntity
-import java.util.Date
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.simon_kotlords.data.model.HighScoreEntity
+import com.example.simon_kotlords.data.repository.LeaderBoardRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-class LeaderBoardViewModel(application: Application) : AndroidViewModel(application){
+@HiltViewModel
+class LeaderBoardViewModel @Inject constructor(private val repository: LeaderBoardRepository) : ViewModel(){
 
-    private val _highscores =  MutableLiveData<List<HighScoreEntity>>()
-    val highscores: LiveData<List<HighScoreEntity>> = _highscores
+    val leaderboardEntries: StateFlow<List<HighScoreEntity>> =
+        repository.highScores
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = emptyList()
+            )
 
-    init {
-        loadExampleLeaderBoard()
-    }
-
-    private fun loadExampleLeaderBoard(){
-        //esempi che ho messo, dopo li prenderemo dal database
-        val highscoresList = listOf(
-            HighScoreEntity(date = Date(), 1, 100),
-            HighScoreEntity(date = Date(), 2, 98),
-            HighScoreEntity(date = Date(), 3, 96),
-            HighScoreEntity(date = Date(), 4, 94),
-            HighScoreEntity(date = Date(), 5, 92),
-            HighScoreEntity(date = Date(), 1, 100),
-            HighScoreEntity(date = Date(), 2, 98),
-            HighScoreEntity(date = Date(), 3, 96),
-            HighScoreEntity(date = Date(), 4, 94),
-            HighScoreEntity(date = Date(), 5, 92),
-            HighScoreEntity(date = Date(), 1, 100),
-            HighScoreEntity(date = Date(), 2, 98),
-            HighScoreEntity(date = Date(), 3, 96),
-            HighScoreEntity(date = Date(), 4, 94),
-            HighScoreEntity(date = Date(), 5, 92)
-        ).sortedByDescending { it.score }
-        _highscores.value = highscoresList
-    }
-    fun addHighscore(date: Date, level: Int, score: Int){
-        val newHighScore = HighScoreEntity(date, level, score)
-        val currentList = _highscores.value ?: emptyList()
-        val updatedList = currentList + newHighScore
-        _highscores.value = updatedList.sortedByDescending { it.score }
-
-    }
 }
 

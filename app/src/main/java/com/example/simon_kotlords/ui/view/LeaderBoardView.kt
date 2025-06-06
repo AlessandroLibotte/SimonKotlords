@@ -17,21 +17,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.simon_kotlords.ui.entity.HighScoreEntity
+import com.example.simon_kotlords.data.model.HighScoreEntity
 import com.example.simon_kotlords.ui.model.LeaderBoardViewModel
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun LeaderBoardView(
     modifier: Modifier = Modifier,
-    leaderBoardViewModel: LeaderBoardViewModel = viewModel()
+    leaderBoardViewModel: LeaderBoardViewModel = hiltViewModel()
 ) {
 
-    val leaderBoardList by leaderBoardViewModel.highscores.observeAsState(emptyList())
+    val leaderBoardList by leaderBoardViewModel.leaderboardEntries.collectAsStateWithLifecycle()
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -76,7 +79,7 @@ fun LeaderBoardView(
 @Composable
 fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modifier = Modifier) {
 
-    val dateFormatter = SimpleDateFormat("dd MMM yyy, HH:mm", Locale.getDefault())
+    val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyy")
 
     Card(
         modifier = modifier,
@@ -97,7 +100,7 @@ fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modif
                 modifier = Modifier.weight(0.7f)
             )
             Text(
-                text = dateFormatter.format(highscore.date),
+                text = highscore.date.format(dateFormatter),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1.5f)

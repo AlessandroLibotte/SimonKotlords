@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import com.example.simon_kotlords.ui.view.CreditsView
 import com.example.simon_kotlords.ui.view.GameView
 import com.example.simon_kotlords.ui.view.LeaderBoardView
 import com.example.simon_kotlords.ui.view.MainMenuView
+import dagger.hilt.android.AndroidEntryPoint
 
 object AppDestinations {
     const val MAIN_MENU_ROUTE = "main_menu"
@@ -43,6 +45,7 @@ object AppDestinations {
     const val CREDITS_ROUTE = "credits"
 }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

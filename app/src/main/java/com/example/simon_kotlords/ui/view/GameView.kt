@@ -1,6 +1,5 @@
 package com.example.simon_kotlords.ui.view
 
-import android.widget.ImageButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -33,19 +32,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.simon_kotlords.R
 import com.example.simon_kotlords.ui.model.GameViewModel
-import com.example.simon_kotlords.ui.theme.SimonBlue
-import com.example.simon_kotlords.ui.theme.SimonGreen
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
-import com.example.simon_kotlords.ui.theme.SimonRed
-import com.example.simon_kotlords.ui.theme.SimonYellow
 
 @Composable
 fun GameView(
     modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = viewModel()
+    gameViewModel: GameViewModel = hiltViewModel()
 ){
 
     val redActive = gameViewModel.redActive.observeAsState(false)
