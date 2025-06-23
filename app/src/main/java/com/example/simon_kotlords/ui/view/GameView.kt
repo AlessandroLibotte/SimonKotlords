@@ -10,10 +10,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,8 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.simon_kotlords.R
 import com.example.simon_kotlords.ui.model.GameViewModel
@@ -41,23 +52,24 @@ import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 fun GameView(
     modifier: Modifier = Modifier,
     gameViewModel: GameViewModel = hiltViewModel()
-){
+) {
 
-    val redActive = gameViewModel.redActive.observeAsState(false)
-    val greenActive = gameViewModel.greenActive.observeAsState(false)
-    val blueActive = gameViewModel.blueActive.observeAsState(false)
-    val yellowActive = gameViewModel.yellowActive.observeAsState(false)
-    val isPlaying = gameViewModel.isPlaying.observeAsState(false)
-
-    val sequence = gameViewModel.sequence.observeAsState(emptyList())
-    val inputSequence = gameViewModel.inputSequence.observeAsState(emptyList())
-    val gameOver = gameViewModel.gameOver.observeAsState(false)
-    val level = gameViewModel.level.observeAsState(1)
-    val score = gameViewModel.score.observeAsState(0)
+    val redActive by gameViewModel.redActive.observeAsState(false)
+    val greenActive by gameViewModel.greenActive.observeAsState(false)
+    val blueActive by gameViewModel.blueActive.observeAsState(false)
+    val yellowActive by gameViewModel.yellowActive.observeAsState(false)
+    val isPlayingSequence by gameViewModel.isPlaying.observeAsState(false)
+    val isPaused by gameViewModel.isPaused.observeAsState(false)
+    //val sequence = gameViewModel.sequence.observeAsState(emptyList())
+    //val inputSequence = gameViewModel.inputSequence.observeAsState(emptyList())
+    val gameOver by gameViewModel.gameOver.observeAsState(false)
+    val level by gameViewModel.level.observeAsState(1)
+    val score by gameViewModel.score.observeAsState(0)
+    var gameHasBeenStarted by remember {mutableStateOf(false)}
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color= MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background
     ) {
 
         Column(
@@ -67,138 +79,135 @@ fun GameView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-
-            Text(
-                if (isPlaying.value == true) "Fai attenzione!" else "Ora tocca a te!",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Box(
-                contentAlignment = Alignment.Center,
+            // RIGA SUPERIORE: Testo di stato e Pulsante Pausa
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Image(
-                    painter = painterResource(id = R.drawable.game_logo_purple),
-                    contentDescription = "Logo",
-                    modifier = Modifier.size(360.dp)
+                Text(
+                    text = when {
+                        !gameHasBeenStarted -> "Premi Start!"
+                        gameOver -> "Game Over!"
+                        isPaused -> "In Pausa" // Mostra "In Pausa"
+                        isPlayingSequence -> "Fai attenzione!"
+                        else -> "Ora tocca a te!"
+                    },
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
                 )
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-
-                        ArcButton(painterResource(id = R.drawable.red),
-                            redActive.value, !isPlaying.value, gameViewModel::redPressed)
-
-                        ArcButton(painterResource(id = R.drawable.bluee),
-                            greenActive.value, !isPlaying.value, gameViewModel::greenPressed)
+                if (gameHasBeenStarted && !gameOver) { // Mostra solo se il gioco è attivo
+                    IconButton(onClick = {
+                        android.util.Log.d("GameView", "Pause/Resume button clicked. Current isPaused: $isPaused")
+                        gameViewModel.togglePauseResumeGame()
+                    }) {
+                        Icon(
+                            imageVector = if (isPaused) Icons.Filled.PlayArrow else Icons.Filled.Star,
+                            contentDescription = if (isPaused) "Riprendi Gioco" else "Metti in Pausa Gioco",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        ArcButton(painterResource(id = R.drawable.yellow),
-                            yellowActive.value, !isPlaying.value, gameViewModel::yellowPressed)
-
-                        ArcButton(painterResource(id = R.drawable.green),
-                            blueActive.value, !isPlaying.value, gameViewModel::bluePressed)
-                    }
-
-
+                } else {
+                    Spacer(Modifier.size(48.dp)) // Placeholder per mantenere l'allineamento
                 }
             }
 
-            if(gameOver.value) {
-                Text(
-                    "Game Over",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
 
-            }
+            Box(
+                    contentAlignment = Alignment.Center,
+                ) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.game_logo_purple),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(360.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ArcButton(
+                                image = painterResource(id = R.drawable.red),
+                                isActive = redActive,
+                                // Abilita se non sta suonando la sequenza E NON è in pausa E NON game over
+                                enable = !isPlayingSequence && !isPaused && !gameOver && gameHasBeenStarted,
+                                onClick = gameViewModel::redPressed
+                            )
+                            ArcButton(
+                                image = painterResource(id = R.drawable.bluee), // Il tuo VERDE
+                                isActive = greenActive,
+                                enable = !isPlayingSequence && !isPaused && !gameOver && gameHasBeenStarted,
+                                onClick = gameViewModel::greenPressed // Assicurati sia greenPressed
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ArcButton(
+                                image = painterResource(id = R.drawable.yellow),
+                                isActive = yellowActive,
+                                enable = !isPlayingSequence && !isPaused && !gameOver && gameHasBeenStarted,
+                                onClick = gameViewModel::yellowPressed
+                            )
+                            ArcButton(
+                                image = painterResource(id = R.drawable.green), // Il tuo BLU
+                                isActive = blueActive,
+                                enable = !isPlayingSequence && !isPaused && !gameOver && gameHasBeenStarted,
+                                onClick = gameViewModel::bluePressed // Assicurati sia bluePressed
+                            )
+                        }
 
 
+                    }
+                }
+            // Livello e Punteggio
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-
-                Text(
-                    "Livello ${level.value}",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    "Score: ${score.value}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
+                if (gameHasBeenStarted || gameOver) {
+                    Text(
+                        "Livello ${level}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "Score: ${score}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
-        }
-    }
 
-}
-
-@Composable
-fun ArcButtonCanvas(
-    color: Color,
-    startAngle: Float,
-    sweepAngle: Float,
-    offsetX: Dp,
-    offsetY: Dp,
-    isActive: Boolean,
-    enable: Boolean,
-    onClick: () -> Unit,
-){
-
-    val interactionSource = remember { MutableInteractionSource()}
-
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val animatedColor = if (isPressed || isActive) {
-        color.copy(alpha = color.alpha,
-            red = (color.red + (1f - color.red) * 0.4f).coerceIn(0f, 1f),
-            green = (color.green + (1f - color.green) * 0.4f).coerceIn(0f, 1f),
-            blue = (color.blue + (1f - color.blue) * 0.4f).coerceIn(0f, 1f)
-        )
-    } else {
-        color
-    }
-
-    Canvas (
-    modifier = Modifier
-        .size(125.dp, 125.dp)
-        .clickable(
-            enabled = enable,
-            interactionSource = interactionSource,
-            onClick = onClick,
-            indication = null
-        ),
-    ){
-
-        drawArc(
-            color = animatedColor,
-            startAngle = startAngle,
-            sweepAngle = sweepAngle,
-            useCenter = false,
-            size = Size(155.dp.toPx(), 155.dp.toPx()),
-            topLeft = Offset(offsetX.toPx(), offsetY.toPx()),
-            style = Stroke(width = 55.dp.toPx()),
-
-        )
-    }
-
+            // Pulsante START / RIGIOCA
+            if (!gameHasBeenStarted || gameOver) {
+                Button(
+                    onClick = {
+                        gameViewModel.startGame()
+                        gameHasBeenStarted = true
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(if (gameOver) "RIGIOCA" else "INIZIA GIOCO", fontSize = 18.sp)
+                }
+            } else {
+                Spacer(Modifier.height(50.dp)) // Per mantenere il layout stabile
+            }
+        } // Fine Column principale
+    } // Fine Surface
 }
 
 @Composable
@@ -208,11 +217,8 @@ fun ArcButton(
     enable: Boolean,
     onClick: () -> Unit,
 ){
-
     val interactionSource = remember { MutableInteractionSource()}
-
     val isPressed by interactionSource.collectIsPressedAsState()
-
     Box(
         modifier = Modifier
             .size(125.dp)
