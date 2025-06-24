@@ -44,6 +44,9 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
+    private val _difficulty = MutableLiveData<Int>()
+    val difficulty: LiveData<Int> = _difficulty
+
     init {
         updateSequence()
         playSequence()
@@ -123,27 +126,27 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
                 when (color) {
                     1 -> {
                         _redActive.value = true
-                        delay(1000)
+                        delay(1000L/difficulty.value!!)
                         _redActive.value = false
-                        delay(500)
+                        delay(500L/difficulty.value!!)
                     }
                     2 -> {
                         _greenActive.value = true
-                        delay(1000)
+                        delay(1000L/difficulty.value!!)
                         _greenActive.value = false
-                        delay(500)
+                        delay(500L/difficulty.value!!)
                     }
                     3 -> {
                         _blueActive.value = true
-                        delay(1000)
+                        delay(1000L/difficulty.value!!)
                         _blueActive.value = false
-                        delay(500)
+                        delay(500L/difficulty.value!!)
                     }
                     4 -> {
                         _yellowActive.value = true
-                        delay(1000)
+                        delay(1000L/difficulty.value!!)
                         _yellowActive.value = false
-                        delay(500)
+                        delay(500L/difficulty.value!!)
                     }
                 }
             }
