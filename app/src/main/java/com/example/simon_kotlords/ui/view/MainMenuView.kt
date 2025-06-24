@@ -1,6 +1,5 @@
 package com.example.simon_kotlords.ui.view
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,13 +31,15 @@ import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 
 @Composable
 fun MainMenuView(
-    onPlayClicked: () -> Unit,
+    currentDifficulty: Int,
+    onPlayClicked: (difficulty: Int) -> Unit,
+    onDifficultyChanged: (newDifficulty: Int) -> Unit,
     onHighlightsClicked: () -> Unit,
     onCreditsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
-    var difficulty = remember { mutableIntStateOf(1) }
+    var difficulty = remember { mutableIntStateOf(currentDifficulty) }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -89,7 +90,10 @@ fun MainMenuView(
                     horizontalArrangement = Arrangement.SpaceAround
                 ){
                     IconButton(
-                        onClick = { if (difficulty.intValue > 1) difficulty.intValue = difficulty.intValue -1 },
+                        onClick = {
+                            if (difficulty.intValue > 1) difficulty.intValue = difficulty.intValue -1
+                            onDifficultyChanged(difficulty.intValue)
+                        },
                         modifier = Modifier.size(70.dp),
                     ) {
                         Icon(
@@ -103,7 +107,10 @@ fun MainMenuView(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     IconButton(
-                        onClick = { if (difficulty.intValue < 3) difficulty.intValue = difficulty.intValue+1 },
+                        onClick = {
+                            if (difficulty.intValue < 3) difficulty.intValue = difficulty.intValue+1
+                            onDifficultyChanged(difficulty.intValue)
+                        },
                         modifier = Modifier.size(70.dp),
                     ) {
                         Icon(
@@ -115,7 +122,7 @@ fun MainMenuView(
                 }
 
                 Button(
-                    onClick = onPlayClicked,
+                    onClick = { onPlayClicked(difficulty.intValue) },
                     modifier = Modifier.widthIn(min = 200.dp),
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
                 ) {
@@ -149,6 +156,6 @@ fun MainMenuView(
 @Composable
 fun GreetingPreview() {
     SimonKotlordsTheme {
-        MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
+        //MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
     }
 }

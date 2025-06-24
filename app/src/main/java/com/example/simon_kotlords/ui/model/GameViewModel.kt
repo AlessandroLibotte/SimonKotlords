@@ -2,8 +2,10 @@ package com.example.simon_kotlords.ui.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.simon_kotlords.AppDestinations
 import com.example.simon_kotlords.data.repository.LeaderBoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -12,7 +14,10 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class GameViewModel @Inject constructor( private val repository: LeaderBoardRepository) : ViewModel(){
+class GameViewModel @Inject constructor(
+    private val repository: LeaderBoardRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel(){
 
     private val _sequence = MutableLiveData<List<Int>>()
     val sequence: LiveData<List<Int>> = _sequence
@@ -44,8 +49,9 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
     private val _isPlaying = MutableLiveData<Boolean>()
     val isPlaying: LiveData<Boolean> = _isPlaying
 
-    private val _difficulty = MutableLiveData<Int>()
-    val difficulty: LiveData<Int> = _difficulty
+    val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
+
+    private val calculatedDelay = 1000L / difficulty.toLong().coerceAtLeast(1)
 
     init {
         updateSequence()
@@ -126,27 +132,27 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
                 when (color) {
                     1 -> {
                         _redActive.value = true
-                        delay(1000L/difficulty.value!!)
+                        delay(calculatedDelay)
                         _redActive.value = false
-                        delay(500L/difficulty.value!!)
+                        delay(calculatedDelay/2)
                     }
                     2 -> {
                         _greenActive.value = true
-                        delay(1000L/difficulty.value!!)
+                        delay(calculatedDelay)
                         _greenActive.value = false
-                        delay(500L/difficulty.value!!)
+                        delay(calculatedDelay/2)
                     }
                     3 -> {
                         _blueActive.value = true
-                        delay(1000L/difficulty.value!!)
+                        delay(calculatedDelay)
                         _blueActive.value = false
-                        delay(500L/difficulty.value!!)
+                        delay(calculatedDelay/2)
                     }
                     4 -> {
                         _yellowActive.value = true
-                        delay(1000L/difficulty.value!!)
+                        delay(calculatedDelay)
                         _yellowActive.value = false
-                        delay(500L/difficulty.value!!)
+                        delay(calculatedDelay/2)
                     }
                 }
             }
