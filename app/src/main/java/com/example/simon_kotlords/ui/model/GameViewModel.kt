@@ -2,17 +2,23 @@ package com.example.simon_kotlords.ui.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.simon_kotlords.AppDestinations
 import com.example.simon_kotlords.data.repository.LeaderBoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class GameViewModel @Inject constructor( private val repository: LeaderBoardRepository) : ViewModel(){
+class GameViewModel @Inject constructor(
+    private val repository: LeaderBoardRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel(){
 
     private val _sequence = MutableLiveData<List<Int>>()
     val sequence: LiveData<List<Int>> = _sequence
@@ -41,12 +47,77 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
     private val _yellowActive = MutableLiveData<Boolean>()
     val yellowActive: LiveData<Boolean> = _yellowActive
 
-    private val _isPlaying = MutableLiveData<Boolean>()
-    val isPlaying: LiveData<Boolean> = _isPlaying
+    private val _isPlayingSequence = MutableLiveData<Boolean>()
+    val isPlayingSequence: LiveData<Boolean> = _isPlayingSequence
+
+    private val _isGameInProgress = MutableLiveData<Boolean>()
+    val isGameInProgress: LiveData<Boolean> = _isGameInProgress
+
+    private val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
+
+    private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1)
+
+    private val _topText = MutableLiveData<String>()
+    val topText: LiveData<String> = _topText
+
+    private val _bottomButtonText = MutableLiveData<String>()
+    val bottomButtonText: LiveData<String> = _bottomButtonText
+
+    private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
+    val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
+
+    private var _playingSequenceJob: Job? = null
 
     init {
+        _topText.value = "Pay attention!"
+        _bottomButtonText.value = "Start Game!"
+        _bottomButtonCallback.value = ::startGame
+    }
+
+    fun startGame() {
+
+        _isGameInProgress.value = true
+        _gameOver.value = false
+        _level.value = 1
+        _score.value = 0
+        _sequence.value = emptyList()
+        _inputSequence.value = emptyList()
+        _bottomButtonText.value = "Pause"
+        _bottomButtonCallback.value = ::pauseGame
+
         updateSequence()
-        playSequence()
+
+        countdown()
+    }
+
+    fun countdown(){
+
+        _playingSequenceJob = viewModelScope.launch {
+            for (i in 3 downTo 1) {
+                _topText.value = "Pay attention!\n$i..."
+                delay(1000L)
+            }
+
+            playSequence()
+        }
+
+    }
+
+    fun pauseGame() {
+        _playingSequenceJob?.cancel()
+        _bottomButtonCallback.value = ::resumeGame
+        _bottomButtonText.value = "Resume"
+        _topText.value = "Game Paused"
+        _redActive.value = false
+        _greenActive.value = false
+        _blueActive.value = false
+        _yellowActive.value = false
+    }
+
+    fun resumeGame(){
+        _bottomButtonText.value = "Pause"
+        _bottomButtonCallback.value = ::pauseGame
+        countdown()
     }
 
     fun updateSequence() {
@@ -73,9 +144,13 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
     }
 
     fun gameOver(){
+
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
+        _topText.value = "Game Over"
+        _bottomButtonText.value = "Start Game!"
+        _bottomButtonCallback.value = ::startGame
 
         repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
 
@@ -84,7 +159,9 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
     fun nexLevel(){
         _level.value = (level.value ?: 0) + 1
         updateSequence()
-        playSequence()
+        _playingSequenceJob = viewModelScope.launch {
+            playSequence()
+        }
         _inputSequence.value = emptyList()
     }
 
@@ -112,43 +189,43 @@ class GameViewModel @Inject constructor( private val repository: LeaderBoardRepo
         checkSequence()
     }
 
-    fun playSequence() {
+    suspend fun playSequence() {
 
-        viewModelScope.launch {
+        _isPlayingSequence.value = true
+        _topText.value = "Pay attention!"
+        delay(1000)
 
-            _isPlaying.value = true
-            delay(1000)
-
-            for (color in sequence.value ?: emptyList()) {
-                when (color) {
-                    1 -> {
-                        _redActive.value = true
-                        delay(1000)
-                        _redActive.value = false
-                        delay(500)
-                    }
-                    2 -> {
-                        _greenActive.value = true
-                        delay(1000)
-                        _greenActive.value = false
-                        delay(500)
-                    }
-                    3 -> {
-                        _blueActive.value = true
-                        delay(1000)
-                        _blueActive.value = false
-                        delay(500)
-                    }
-                    4 -> {
-                        _yellowActive.value = true
-                        delay(1000)
-                        _yellowActive.value = false
-                        delay(500)
-                    }
+        for (color in sequence.value ?: emptyList()) {
+            when (color) {
+                1 -> {
+                    _redActive.value = true
+                    delay(calculatedDelay)
+                    _redActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                2 -> {
+                    _greenActive.value = true
+                    delay(calculatedDelay)
+                    _greenActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                3 -> {
+                    _blueActive.value = true
+                    delay(calculatedDelay)
+                    _blueActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                4 -> {
+                    _yellowActive.value = true
+                    delay(calculatedDelay)
+                    _yellowActive.value = false
+                    delay(calculatedDelay/2)
                 }
             }
-            _isPlaying.value = false
         }
+        _isPlayingSequence.value = false
+        _topText.value = "Now is your turn!"
+
     }
 
 }

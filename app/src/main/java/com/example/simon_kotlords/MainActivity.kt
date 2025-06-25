@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -28,9 +27,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 import com.example.simon_kotlords.ui.view.CreditsView
 import com.example.simon_kotlords.ui.view.GameView
@@ -43,6 +47,8 @@ object AppDestinations {
     const val PLAY_GAME_ROUTE = "play_game"
     const val LEADERBOARD_ROUTE = "leaderboard"
     const val CREDITS_ROUTE = "credits"
+    const val DIFFICULTY_ARG = "difficulty"
+    val playGameRouteWithArg =  "$PLAY_GAME_ROUTE/{$DIFFICULTY_ARG}"
 }
 
 @AndroidEntryPoint
@@ -64,6 +70,8 @@ fun Content() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    var rememberedDifficulty by rememberSaveable { mutableIntStateOf(1) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -92,7 +100,9 @@ fun Content() {
                 }
             ) {
                 MainMenuView(
-                    onPlayClicked = { navController.navigate(AppDestinations.PLAY_GAME_ROUTE) },
+                    currentDifficulty = rememberedDifficulty,
+                    onPlayClicked = {difficulty -> navController.navigate("${AppDestinations.PLAY_GAME_ROUTE}/$difficulty") },
+                    onDifficultyChanged = { newDifficulty -> rememberedDifficulty = newDifficulty },
                     onHighlightsClicked = { navController.navigate(AppDestinations.LEADERBOARD_ROUTE) },
                     onCreditsClicked = { navController.navigate(AppDestinations.CREDITS_ROUTE) },
                     modifier = Modifier.padding(innerPadding)
@@ -100,12 +110,17 @@ fun Content() {
             }
 
             composable(
-                AppDestinations.PLAY_GAME_ROUTE,
+                route = AppDestinations.playGameRouteWithArg,
+                arguments = listOf(navArgument(AppDestinations.DIFFICULTY_ARG) {
+                    type = NavType.IntType
+                    defaultValue = 1
+                    }
+                ),
                 enterTransition = null,
                 exitTransition = null,
                 popEnterTransition = null,
                 popExitTransition = null
-            ) { GameView() }
+            ) { GameView(modifier = Modifier.padding(innerPadding)) }
             composable(
                 AppDestinations.LEADERBOARD_ROUTE,
                 enterTransition = null,

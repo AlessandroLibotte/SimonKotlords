@@ -1,19 +1,26 @@
 package com.example.simon_kotlords.ui.view
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,11 +31,15 @@ import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 
 @Composable
 fun MainMenuView(
-    onPlayClicked: () -> Unit,
+    currentDifficulty: Int,
+    onPlayClicked: (difficulty: Int) -> Unit,
+    onDifficultyChanged: (newDifficulty: Int) -> Unit,
     onHighlightsClicked: () -> Unit,
     onCreditsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    var difficulty = remember { mutableIntStateOf(currentDifficulty) }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -69,8 +80,49 @@ fun MainMenuView(
                 verticalArrangement = Arrangement.Center
             ) {
 
+                Text(
+                    text = "Difficulty:",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ){
+                    IconButton(
+                        onClick = {
+                            if (difficulty.intValue > 1) difficulty.intValue = difficulty.intValue -1
+                            onDifficultyChanged(difficulty.intValue)
+                        },
+                        modifier = Modifier.size(70.dp),
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp),
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Go back"
+                        )
+                    }
+                    Text(
+                        text= if(difficulty.intValue == 1) "Easy" else if(difficulty.intValue == 2) "Medium" else "Hard",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    IconButton(
+                        onClick = {
+                            if (difficulty.intValue < 3) difficulty.intValue = difficulty.intValue+1
+                            onDifficultyChanged(difficulty.intValue)
+                        },
+                        modifier = Modifier.size(70.dp),
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp),
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "Go back"
+                        )
+                    }
+                }
+
                 Button(
-                    onClick = onPlayClicked,
+                    onClick = { onPlayClicked(difficulty.intValue) },
                     modifier = Modifier.widthIn(min = 200.dp),
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
                 ) {
@@ -104,6 +156,6 @@ fun MainMenuView(
 @Composable
 fun GreetingPreview() {
     SimonKotlordsTheme {
-        MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
+        //MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
     }
 }
