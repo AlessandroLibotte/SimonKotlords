@@ -62,6 +62,8 @@ fun GameView(
     val isGameInProgress = gameViewModel.isGameInProgress.observeAsState(false)
     val isGamePaused = gameViewModel.isGamePaused.observeAsState(false)
     val topText = gameViewModel.topText.observeAsState("Pay attention!")
+    val bottomButtonText = gameViewModel.bottomButtonText.observeAsState("Start Game!")
+    val bottomButtonCallback = gameViewModel.bottomButtonCallback.observeAsState(gameViewModel::startGame)
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -129,47 +131,43 @@ fun GameView(
                 }
             }
 
-            Box(
-                modifier = Modifier.defaultMinSize(minHeight = 150.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 230.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
 
                 if (isGameInProgress.value) {
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
+                    Text(
+                        if (gameOver.value) "Game Over" else "",
+                        modifier = Modifier.padding(bottom = 15.dp),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
 
-                        Text(
-                            if (gameOver.value) "Game Over\n" else "\n",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                    Text(
+                        "Livello ${level.value}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "Score: ${score.value}",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 15.dp)
+                    )
 
-                        Text(
-                            "Livello ${level.value}",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            "Score: ${score.value}",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                }
 
-                    }
-
-                } else {
-
-                    Button(
-                        onClick = gameViewModel::startGame,
-                        modifier = Modifier.widthIn(min = 200.dp),
-                        colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
-                    ) {
-                        Text(text = "Start Game!")
-                    }
-
+                Button(
+                    onClick = bottomButtonCallback.value,
+                    modifier = Modifier.widthIn(min = 200.dp),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                ) {
+                    Text(bottomButtonText.value)
                 }
 
             }

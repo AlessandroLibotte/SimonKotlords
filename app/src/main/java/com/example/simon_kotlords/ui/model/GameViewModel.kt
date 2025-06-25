@@ -62,6 +62,18 @@ class GameViewModel @Inject constructor(
     private val _topText = MutableLiveData<String>()
     val topText: LiveData<String> = _topText
 
+    private val _bottomButtonText = MutableLiveData<String>()
+    val bottomButtonText: LiveData<String> = _bottomButtonText
+
+    private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
+    val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
+
+    init {
+        _topText.value = "Pay attention!"
+        _bottomButtonText.value = "Start Game!"
+        _bottomButtonCallback.value = ::startGame
+    }
+
     fun startGame() {
 
         _isGameInProgress.value = true
@@ -70,6 +82,8 @@ class GameViewModel @Inject constructor(
         _score.value = 0
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
+        _bottomButtonText.value = "Pause"
+        _bottomButtonCallback.value = ::pauseGame
 
         updateSequence()
 
@@ -81,6 +95,11 @@ class GameViewModel @Inject constructor(
 
             playSequence()
         }
+    }
+
+    fun pauseGame() {
+        _isGamePaused.value = !(_isGamePaused.value ?: false)
+        _bottomButtonText.value = if (_isGamePaused.value == true) "Resume" else "Pause"
     }
 
     fun updateSequence() {
@@ -107,10 +126,13 @@ class GameViewModel @Inject constructor(
     }
 
     fun gameOver(){
+
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
         _topText.value = "Game Over"
+        _bottomButtonText.value = "Start Game!"
+        _bottomButtonCallback.value = ::startGame
 
         repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
 

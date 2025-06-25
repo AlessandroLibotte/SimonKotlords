@@ -120,7 +120,7 @@ fun Content() {
                 exitTransition = null,
                 popEnterTransition = null,
                 popExitTransition = null
-            ) { GameView() }
+            ) { GameView(modifier = Modifier.padding(innerPadding)) }
             composable(
                 AppDestinations.LEADERBOARD_ROUTE,
                 enterTransition = null,
