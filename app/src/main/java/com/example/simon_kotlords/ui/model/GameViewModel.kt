@@ -46,16 +46,41 @@ class GameViewModel @Inject constructor(
     private val _yellowActive = MutableLiveData<Boolean>()
     val yellowActive: LiveData<Boolean> = _yellowActive
 
-    private val _isPlaying = MutableLiveData<Boolean>()
-    val isPlaying: LiveData<Boolean> = _isPlaying
+    private val _isPlayingSequence = MutableLiveData<Boolean>()
+    val isPlayingSequence: LiveData<Boolean> = _isPlayingSequence
 
-    val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
+    private val _isGameInProgress = MutableLiveData<Boolean>()
+    val isGameInProgress: LiveData<Boolean> = _isGameInProgress
 
-    private val calculatedDelay = 1000L / difficulty.toLong().coerceAtLeast(1)
+    private val _isGamePaused = MutableLiveData<Boolean>()
+    val isGamePaused: LiveData<Boolean> = _isGamePaused
 
-    init {
+    private val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
+
+    private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1)
+
+    private val _topText = MutableLiveData<String>()
+    val topText: LiveData<String> = _topText
+
+    fun startGame() {
+
+        _isGameInProgress.value = true
+        _gameOver.value = false
+        _level.value = 1
+        _score.value = 0
+        _sequence.value = emptyList()
+        _inputSequence.value = emptyList()
+
         updateSequence()
-        playSequence()
+
+        viewModelScope.launch {
+            for (i in 3 downTo 1) {
+                _topText.value = "Pay attention!\n$i..."
+                delay(1000L)
+            }
+
+            playSequence()
+        }
     }
 
     fun updateSequence() {
@@ -85,6 +110,7 @@ class GameViewModel @Inject constructor(
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
+        _topText.value = "Game Over"
 
         repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
 
@@ -93,7 +119,9 @@ class GameViewModel @Inject constructor(
     fun nexLevel(){
         _level.value = (level.value ?: 0) + 1
         updateSequence()
-        playSequence()
+        viewModelScope.launch {
+            playSequence()
+        }
         _inputSequence.value = emptyList()
     }
 
@@ -121,43 +149,43 @@ class GameViewModel @Inject constructor(
         checkSequence()
     }
 
-    fun playSequence() {
+    suspend fun playSequence() {
 
-        viewModelScope.launch {
+        _isPlayingSequence.value = true
+        _topText.value = "Pay attention!"
+        delay(1000)
 
-            _isPlaying.value = true
-            delay(1000)
-
-            for (color in sequence.value ?: emptyList()) {
-                when (color) {
-                    1 -> {
-                        _redActive.value = true
-                        delay(calculatedDelay)
-                        _redActive.value = false
-                        delay(calculatedDelay/2)
-                    }
-                    2 -> {
-                        _greenActive.value = true
-                        delay(calculatedDelay)
-                        _greenActive.value = false
-                        delay(calculatedDelay/2)
-                    }
-                    3 -> {
-                        _blueActive.value = true
-                        delay(calculatedDelay)
-                        _blueActive.value = false
-                        delay(calculatedDelay/2)
-                    }
-                    4 -> {
-                        _yellowActive.value = true
-                        delay(calculatedDelay)
-                        _yellowActive.value = false
-                        delay(calculatedDelay/2)
-                    }
+        for (color in sequence.value ?: emptyList()) {
+            when (color) {
+                1 -> {
+                    _redActive.value = true
+                    delay(calculatedDelay)
+                    _redActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                2 -> {
+                    _greenActive.value = true
+                    delay(calculatedDelay)
+                    _greenActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                3 -> {
+                    _blueActive.value = true
+                    delay(calculatedDelay)
+                    _blueActive.value = false
+                    delay(calculatedDelay/2)
+                }
+                4 -> {
+                    _yellowActive.value = true
+                    delay(calculatedDelay)
+                    _yellowActive.value = false
+                    delay(calculatedDelay/2)
                 }
             }
-            _isPlaying.value = false
         }
+        _isPlayingSequence.value = false
+        _topText.value = "Now is your turn!"
+
     }
 
 }

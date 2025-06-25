@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.simon_kotlords.R
 import com.example.simon_kotlords.ui.model.GameViewModel
@@ -47,13 +52,16 @@ fun GameView(
     val greenActive = gameViewModel.greenActive.observeAsState(false)
     val blueActive = gameViewModel.blueActive.observeAsState(false)
     val yellowActive = gameViewModel.yellowActive.observeAsState(false)
-    val isPlaying = gameViewModel.isPlaying.observeAsState(false)
+    val isPlaying = gameViewModel.isPlayingSequence.observeAsState(false)
 
     val sequence = gameViewModel.sequence.observeAsState(emptyList())
     val inputSequence = gameViewModel.inputSequence.observeAsState(emptyList())
     val gameOver = gameViewModel.gameOver.observeAsState(false)
     val level = gameViewModel.level.observeAsState(1)
     val score = gameViewModel.score.observeAsState(0)
+    val isGameInProgress = gameViewModel.isGameInProgress.observeAsState(false)
+    val isGamePaused = gameViewModel.isGamePaused.observeAsState(false)
+    val topText = gameViewModel.topText.observeAsState("Pay attention!")
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -69,9 +77,11 @@ fun GameView(
         ) {
 
             Text(
-                if (isPlaying.value == true) "Fai attenzione!" else "Ora tocca a te!",
+                topText.value,
+                modifier = Modifier.padding(top = 30.dp).defaultMinSize(minHeight = 80.dp),
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
 
             Box(
@@ -90,16 +100,18 @@ fun GameView(
                     verticalArrangement = Arrangement.Center
                 ) {
 
+                    var enable = !isPlaying.value.or(gameOver.value)
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
 
                         ArcButton(painterResource(id = R.drawable.red),
-                            redActive.value, !isPlaying.value, gameViewModel::redPressed)
+                            redActive.value, enable, gameViewModel::redPressed)
 
                         ArcButton(painterResource(id = R.drawable.bluee),
-                            greenActive.value, !isPlaying.value, gameViewModel::greenPressed)
+                            greenActive.value, enable, gameViewModel::greenPressed)
                     }
 
                     Row(
@@ -107,41 +119,58 @@ fun GameView(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         ArcButton(painterResource(id = R.drawable.yellow),
-                            yellowActive.value, !isPlaying.value, gameViewModel::yellowPressed)
+                            yellowActive.value, enable, gameViewModel::yellowPressed)
 
                         ArcButton(painterResource(id = R.drawable.green),
-                            blueActive.value, !isPlaying.value, gameViewModel::bluePressed)
+                            blueActive.value, enable, gameViewModel::bluePressed)
                     }
 
 
                 }
             }
 
-            if(gameOver.value) {
-                Text(
-                    "Game Over",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-            }
-
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Box(
+                modifier = Modifier.defaultMinSize(minHeight = 150.dp),
             ) {
 
-                Text(
-                    "Livello ${level.value}",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    "Score: ${score.value}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                if (isGameInProgress.value) {
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
+                        Text(
+                            if (gameOver.value) "Game Over\n" else "\n",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        Text(
+                            "Livello ${level.value}",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            "Score: ${score.value}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                    }
+
+                } else {
+
+                    Button(
+                        onClick = gameViewModel::startGame,
+                        modifier = Modifier.widthIn(min = 200.dp),
+                        colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                    ) {
+                        Text(text = "Start Game!")
+                    }
+
+                }
 
             }
 
