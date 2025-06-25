@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.simon_kotlords.AppDestinations
 import com.example.simon_kotlords.data.repository.LeaderBoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -52,9 +53,6 @@ class GameViewModel @Inject constructor(
     private val _isGameInProgress = MutableLiveData<Boolean>()
     val isGameInProgress: LiveData<Boolean> = _isGameInProgress
 
-    private val _isGamePaused = MutableLiveData<Boolean>()
-    val isGamePaused: LiveData<Boolean> = _isGamePaused
-
     private val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
 
     private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1)
@@ -67,6 +65,8 @@ class GameViewModel @Inject constructor(
 
     private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
     val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
+
+    private var _playingSequenceJob: Job? = null
 
     init {
         _topText.value = "Pay attention!"
@@ -87,7 +87,12 @@ class GameViewModel @Inject constructor(
 
         updateSequence()
 
-        viewModelScope.launch {
+        countdown()
+    }
+
+    fun countdown(){
+
+        _playingSequenceJob = viewModelScope.launch {
             for (i in 3 downTo 1) {
                 _topText.value = "Pay attention!\n$i..."
                 delay(1000L)
@@ -95,11 +100,24 @@ class GameViewModel @Inject constructor(
 
             playSequence()
         }
+
     }
 
     fun pauseGame() {
-        _isGamePaused.value = !(_isGamePaused.value ?: false)
-        _bottomButtonText.value = if (_isGamePaused.value == true) "Resume" else "Pause"
+        _playingSequenceJob?.cancel()
+        _bottomButtonCallback.value = ::resumeGame
+        _bottomButtonText.value = "Resume"
+        _topText.value = "Game Paused"
+        _redActive.value = false
+        _greenActive.value = false
+        _blueActive.value = false
+        _yellowActive.value = false
+    }
+
+    fun resumeGame(){
+        _bottomButtonText.value = "Pause"
+        _bottomButtonCallback.value = ::pauseGame
+        countdown()
     }
 
     fun updateSequence() {
@@ -141,7 +159,7 @@ class GameViewModel @Inject constructor(
     fun nexLevel(){
         _level.value = (level.value ?: 0) + 1
         updateSequence()
-        viewModelScope.launch {
+        _playingSequenceJob = viewModelScope.launch {
             playSequence()
         }
         _inputSequence.value = emptyList()

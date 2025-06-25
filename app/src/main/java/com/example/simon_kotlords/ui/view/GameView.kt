@@ -1,7 +1,6 @@
 package com.example.simon_kotlords.ui.view
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,11 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.getValue
@@ -52,15 +47,12 @@ fun GameView(
     val greenActive = gameViewModel.greenActive.observeAsState(false)
     val blueActive = gameViewModel.blueActive.observeAsState(false)
     val yellowActive = gameViewModel.yellowActive.observeAsState(false)
-    val isPlaying = gameViewModel.isPlayingSequence.observeAsState(false)
+    val isPlayingSequence = gameViewModel.isPlayingSequence.observeAsState(false)
 
-    val sequence = gameViewModel.sequence.observeAsState(emptyList())
-    val inputSequence = gameViewModel.inputSequence.observeAsState(emptyList())
     val gameOver = gameViewModel.gameOver.observeAsState(false)
     val level = gameViewModel.level.observeAsState(1)
     val score = gameViewModel.score.observeAsState(0)
     val isGameInProgress = gameViewModel.isGameInProgress.observeAsState(false)
-    val isGamePaused = gameViewModel.isGamePaused.observeAsState(false)
     val topText = gameViewModel.topText.observeAsState("Pay attention!")
     val bottomButtonText = gameViewModel.bottomButtonText.observeAsState("Start Game!")
     val bottomButtonCallback = gameViewModel.bottomButtonCallback.observeAsState(gameViewModel::startGame)
@@ -102,7 +94,7 @@ fun GameView(
                     verticalArrangement = Arrangement.Center
                 ) {
 
-                    var enable = !isPlaying.value.or(gameOver.value)
+                    var enable = !isPlayingSequence.value.or(gameOver.value)
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -165,7 +157,8 @@ fun GameView(
                 Button(
                     onClick = bottomButtonCallback.value,
                     modifier = Modifier.widthIn(min = 200.dp),
-                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary),
+                    enabled = (!isGameInProgress.value.and(!isPlayingSequence.value)).or(gameOver.value)
                 ) {
                     Text(bottomButtonText.value)
                 }
@@ -177,6 +170,7 @@ fun GameView(
 
 }
 
+/*
 @Composable
 fun ArcButtonCanvas(
     color: Color,
@@ -227,6 +221,7 @@ fun ArcButtonCanvas(
     }
 
 }
+ */
 
 @Composable
 fun ArcButton(
