@@ -3,6 +3,7 @@ package com.example.simon_kotlords.ui.view
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,6 +58,7 @@ fun GameView(
     val topText = gameViewModel.topText.observeAsState("Pay attention!")
     val bottomButtonText = gameViewModel.bottomButtonText.observeAsState("Start Game!")
     val bottomButtonCallback = gameViewModel.bottomButtonCallback.observeAsState(gameViewModel::startGame)
+    val backgroundImage = gameViewModel.backgroundImage.observeAsState(R.drawable.game_logo_pause)
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -80,10 +83,13 @@ fun GameView(
 
             Box(
                 contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 360.dp)
             ) {
 
                 Image(
-                    painter = painterResource(id = R.drawable.game_logo_purple),
+                    painter = painterResource(id = backgroundImage.value),
                     contentDescription = "Logo",
                     modifier = Modifier.size(360.dp)
                 )
@@ -100,12 +106,17 @@ fun GameView(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-
+                        /*
                         ArcButton(painterResource(id = R.drawable.red),
                             redActive.value, enable, gameViewModel::redPressed)
 
                         ArcButton(painterResource(id = R.drawable.bluee),
                             greenActive.value, enable, gameViewModel::greenPressed)
+                         */
+
+                        ArcButtonInvisible(enable, gameViewModel::redPressed, gameViewModel::redReleased)
+                        ArcButtonInvisible(enable, gameViewModel::greenPressed, gameViewModel::greenReleased)
+
                     }
 
                     Row(
@@ -246,13 +257,42 @@ fun ArcButton(
             ),
         contentAlignment = Alignment.Center
     ){
+
         Image(
             painter = image,
             contentDescription = "Arc",
             colorFilter = ColorFilter.tint(Color.White.copy(alpha = if (isPressed || isActive) 0.4f else 0f))
         )
+
     }
 
+}
+
+@Composable
+fun ArcButtonInvisible(
+    enable: Boolean,
+    onClick: () -> Unit,
+    onRelease: () -> Unit
+){
+    Box(
+        modifier = Modifier
+            .size(125.dp)
+            .pointerInput(Unit){
+                detectTapGestures(
+                    onPress = {
+                        if (enable) {
+                            onClick()
+                        }
+                    },
+                    onTap = {
+                        if (enable) {
+                            onRelease()
+                        }
+                    }
+                )
+
+            },
+    )
 }
 
 @Preview(showBackground = true)
