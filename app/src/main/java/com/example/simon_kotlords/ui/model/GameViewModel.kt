@@ -159,8 +159,9 @@ class GameViewModel @Inject constructor(
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
 
-        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
-
+        viewModelScope.launch {
+            repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
+        }
     }
 
     fun nexLevel(){
