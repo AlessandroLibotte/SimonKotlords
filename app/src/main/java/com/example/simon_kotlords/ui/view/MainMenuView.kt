@@ -70,7 +70,7 @@ fun MainMenuView(
             }
 
             Image(
-                painter = painterResource(id = R.drawable.game_logo_purple),
+                painter = painterResource(id = R.drawable.game_play_icon),
                 contentDescription = "Logo",
                 modifier = Modifier.size(360.dp)
             )

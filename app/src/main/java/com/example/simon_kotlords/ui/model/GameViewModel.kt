@@ -103,7 +103,7 @@ class GameViewModel @Inject constructor(
                 delay(1000L)
             }
 
-            _backgroundImage.value = R.drawable.game_logo_purple
+            _backgroundImage.value = R.drawable.game_play_icon
             playSequence()
         }
 
@@ -179,7 +179,7 @@ class GameViewModel @Inject constructor(
     }
 
     fun redReleased(){
-        _backgroundImage.value = R.drawable.game_logo_purple
+        _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
@@ -189,19 +189,30 @@ class GameViewModel @Inject constructor(
         _backgroundImage.value = R.drawable.game_green_press
     }
     fun greenReleased(){
-        _backgroundImage.value = R.drawable.game_logo_purple
+        _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
     fun bluePressed()
     {
         _inputSequence.value = inputSequence.value?.plus(3) ?: listOf(3)
+        _backgroundImage.value = R.drawable.game_blue_pressed
+    }
+
+    fun blueReleased(){
+        _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
+
 
     fun yellowPressed()
     {
         _inputSequence.value = inputSequence.value?.plus(4) ?: listOf(4)
+        _backgroundImage.value = R.drawable.game_yellow_press
+    }
+
+    fun yellowReleased(){
+        _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
@@ -218,7 +229,7 @@ class GameViewModel @Inject constructor(
                     _backgroundImage.value = R.drawable.game_red_press
                     delay(calculatedDelay)
                     _redActive.value = false
-                    _backgroundImage.value = R.drawable.game_logo_purple
+                    _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 2 -> {
@@ -226,19 +237,23 @@ class GameViewModel @Inject constructor(
                     _backgroundImage.value = R.drawable.game_green_press
                     delay(calculatedDelay)
                     _greenActive.value = false
-                    _backgroundImage.value = R.drawable.game_logo_purple
+                    _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 3 -> {
                     _blueActive.value = true
+                    _backgroundImage.value = R.drawable.game_blue_pressed
                     delay(calculatedDelay)
                     _blueActive.value = false
+                    _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 4 -> {
                     _yellowActive.value = true
+                    _backgroundImage.value = R.drawable.game_yellow_press
                     delay(calculatedDelay)
                     _yellowActive.value = false
+                    _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
             }
