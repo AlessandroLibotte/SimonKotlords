@@ -116,21 +116,24 @@ fun GameView(
 
                         ArcButtonInvisible(enable, gameViewModel::redPressed, gameViewModel::redReleased)
                         ArcButtonInvisible(enable, gameViewModel::greenPressed, gameViewModel::greenReleased)
-                        ArcButtonInvisible(enable, gameViewModel::bluePressed, gameViewModel::blueReleased)
-                        ArcButtonInvisible(enable, gameViewModel::yellowPressed, gameViewModel::yellowReleased)
+
 
                     }
-                    /*
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
-                    ) {
+                    ) {/*
                         ArcButton(painterResource(id = R.drawable.yellow),
                             yellowActive.value, enable, gameViewModel::yellowPressed)
 
                         ArcButton(painterResource(id = R.drawable.green),
                             blueActive.value, enable, gameViewModel::bluePressed)
-                    }*/
+                            )*/
+                        ArcButtonInvisible(enable, gameViewModel::yellowPressed, gameViewModel::yellowReleased)
+                        ArcButtonInvisible(enable, gameViewModel::bluePressed, gameViewModel::blueReleased)
+
+                    }
 
 
                 }
