@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.protolite.well.known.types)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,5 +67,5 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
-
+    kapt(libs.androidx.room.compiler)
 }

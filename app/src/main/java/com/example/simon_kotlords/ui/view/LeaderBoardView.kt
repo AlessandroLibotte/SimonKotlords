@@ -36,7 +36,7 @@ fun LeaderBoardView(
     leaderBoardViewModel: LeaderBoardViewModel = hiltViewModel()
 ) {
 
-    val leaderBoardList by leaderBoardViewModel.leaderboardEntries.collectAsStateWithLifecycle()
+    val leaderBoardList by leaderBoardViewModel.leaderboardEntries.collectAsStateWithLifecycle(emptyList())
 
     val difficulty = remember { mutableIntStateOf(currentDifficulty) }
 
@@ -65,8 +65,7 @@ fun LeaderBoardView(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround
-                )
-                {
+                ) {
                     IconButton(
                         onClick = {
                             if (difficulty.intValue > 1) difficulty.intValue =
