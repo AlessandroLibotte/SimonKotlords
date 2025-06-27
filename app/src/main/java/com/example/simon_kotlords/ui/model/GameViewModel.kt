@@ -74,7 +74,7 @@ class GameViewModel @Inject constructor(
 
     init {
         _backgroundImage.value = R.drawable.game_logo_pause
-        _topText.value = "Pay attention!"
+        _topText.value = "When you are ready\npress Start!"
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
     }
@@ -159,7 +159,7 @@ class GameViewModel @Inject constructor(
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
 
-        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
+        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
 
     }
 

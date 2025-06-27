@@ -5,32 +5,40 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.simon_kotlords.data.model.HighScoreEntity
 import com.example.simon_kotlords.ui.model.LeaderBoardViewModel
-import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 import java.time.format.DateTimeFormatter
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun LeaderBoardView(
     modifier: Modifier = Modifier,
+    currentDifficulty: Int = 1,
     leaderBoardViewModel: LeaderBoardViewModel = hiltViewModel()
 ) {
 
     val leaderBoardList by leaderBoardViewModel.leaderboardEntries.collectAsStateWithLifecycle()
+
+    val difficulty = remember { mutableIntStateOf(currentDifficulty) }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -43,29 +51,95 @@ fun LeaderBoardView(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No Highscore found yet", style = MaterialTheme.typography.headlineSmall)
+                Text("No score found yet", style = MaterialTheme.typography.headlineSmall)
             }
 
         } else {
 
-            LazyColumn(
-                modifier = Modifier
-                    .padding(16.dp),
+            Column(
+                modifier = Modifier.padding(16.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
             ) {
-                itemsIndexed(leaderBoardList) { index, highscore ->
 
-                    HighscoreItemView(
-                        highscore = highscore,
-                        position = index + 1
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                )
+                {
+                    IconButton(
+                        onClick = {
+                            if (difficulty.intValue > 1) difficulty.intValue =
+                                difficulty.intValue - 1
+                        },
+                        modifier = Modifier.size(70.dp),
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp),
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "lower difficulty"
+                        )
+                    }
+                    Text(
+                        text = if (difficulty.intValue == 1) "Easy" else if (difficulty.intValue == 2) "Medium" else "Hard",
+                        style = MaterialTheme.typography.headlineSmall
                     )
+                    IconButton(
+                        onClick = {
+                            if (difficulty.intValue < 3) difficulty.intValue =
+                                difficulty.intValue + 1
+                        },
+                        modifier = Modifier.size(70.dp),
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(40.dp),
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "higher difficulty"
+                        )
+                    }
+                }
 
-                    if (index < leaderBoardList.lastIndex) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                val leaderBoardSubList = leaderBoardList.filter { it.difficulty == difficulty.intValue }
+
+                if (leaderBoardSubList.isEmpty()) {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No score found yet",
+                            style = MaterialTheme.typography.headlineSmall
                         )
                     }
 
+                } else {
+
+                    LazyColumn(
+                        Modifier.fillMaxWidth().padding(top = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+
+                        itemsIndexed(leaderBoardSubList) { i, highscore ->
+
+                            HighscoreItemView(
+                                highscore = highscore,
+                                position = i+1
+                            )
+
+                            if (i < leaderBoardSubList.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(
+                                        horizontal = 8.dp,
+                                        vertical = 8.dp
+                                    )
+                                )
+                            }
+
+                        }
+
+                    }
                 }
             }
         }
@@ -108,20 +182,11 @@ fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modif
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "score: ${highscore.score}",
+                text = "Score: ${highscore.score}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HighlightsViewPreviewWithItems() {
-
-    SimonKotlordsTheme {
-        LeaderBoardView()
     }
 }
