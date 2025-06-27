@@ -127,7 +127,7 @@ fun Content() {
                 exitTransition = null,
                 popEnterTransition = null,
                 popExitTransition = null
-            ) { LeaderBoardView(Modifier.padding(innerPadding)) }
+            ) { LeaderBoardView(Modifier.padding(innerPadding), rememberedDifficulty) }
             composable(
                 AppDestinations.CREDITS_ROUTE,
                 enterTransition = null,

@@ -14,9 +14,9 @@ class LeaderBoardRepository @Inject constructor(){
     private val _highScores = MutableStateFlow<List<HighScoreEntity>>(emptyList())
     val highScores: Flow<List<HighScoreEntity>> = _highScores.asStateFlow()
 
-    fun addHighScore(date: LocalDate, level: Int, score: Int){
+    fun addHighScore(date: LocalDate, level: Int, score: Int, difficulty: Int){
 
-        val updatedList = _highScores.value + HighScoreEntity(date, level, score)
+        val updatedList = _highScores.value + HighScoreEntity(date, level, score, difficulty)
         _highScores.value = updatedList.sortedByDescending { it.score }
 
     }

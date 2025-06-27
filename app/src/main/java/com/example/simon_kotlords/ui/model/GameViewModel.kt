@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.simon_kotlords.AppDestinations
+import com.example.simon_kotlords.R
 import com.example.simon_kotlords.data.repository.LeaderBoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -66,10 +67,14 @@ class GameViewModel @Inject constructor(
     private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
     val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
 
+    private val _backgroundImage = MutableLiveData<Int>()
+    val backgroundImage: LiveData<Int> = _backgroundImage
+
     private var _playingSequenceJob: Job? = null
 
     init {
-        _topText.value = "Pay attention!"
+        _backgroundImage.value = R.drawable.game_logo_pause
+        _topText.value = "When you are ready\npress Start!"
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
     }
@@ -98,6 +103,7 @@ class GameViewModel @Inject constructor(
                 delay(1000L)
             }
 
+            _backgroundImage.value = R.drawable.game_logo_purple
             playSequence()
         }
 
@@ -112,6 +118,7 @@ class GameViewModel @Inject constructor(
         _greenActive.value = false
         _blueActive.value = false
         _yellowActive.value = false
+        _backgroundImage.value = R.drawable.game_logo_pause
     }
 
     fun resumeGame(){
@@ -152,7 +159,7 @@ class GameViewModel @Inject constructor(
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
 
-        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0)
+        repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
 
     }
 
@@ -168,12 +175,21 @@ class GameViewModel @Inject constructor(
     fun redPressed()
     {
         _inputSequence.value = inputSequence.value?.plus(1) ?: listOf(1)
+        _backgroundImage.value = R.drawable.game_red_press
+    }
+
+    fun redReleased(){
+        _backgroundImage.value = R.drawable.game_logo_purple
         checkSequence()
     }
 
     fun greenPressed()
     {
         _inputSequence.value = inputSequence.value?.plus(2) ?: listOf(2)
+        _backgroundImage.value = R.drawable.game_green_press
+    }
+    fun greenReleased(){
+        _backgroundImage.value = R.drawable.game_logo_purple
         checkSequence()
     }
 
@@ -199,14 +215,18 @@ class GameViewModel @Inject constructor(
             when (color) {
                 1 -> {
                     _redActive.value = true
+                    _backgroundImage.value = R.drawable.game_red_press
                     delay(calculatedDelay)
                     _redActive.value = false
+                    _backgroundImage.value = R.drawable.game_logo_purple
                     delay(calculatedDelay/2)
                 }
                 2 -> {
                     _greenActive.value = true
+                    _backgroundImage.value = R.drawable.game_green_press
                     delay(calculatedDelay)
                     _greenActive.value = false
+                    _backgroundImage.value = R.drawable.game_logo_purple
                     delay(calculatedDelay/2)
                 }
                 3 -> {
