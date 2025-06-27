@@ -116,9 +116,11 @@ fun GameView(
 
                         ArcButtonInvisible(enable, gameViewModel::redPressed, gameViewModel::redReleased)
                         ArcButtonInvisible(enable, gameViewModel::greenPressed, gameViewModel::greenReleased)
+                        ArcButtonInvisible(enable, gameViewModel::bluePressed, gameViewModel::blueReleased)
+                        ArcButtonInvisible(enable, gameViewModel::yellowPressed, gameViewModel::yellowReleased)
 
                     }
-
+                    /*
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
@@ -128,7 +130,7 @@ fun GameView(
 
                         ArcButton(painterResource(id = R.drawable.green),
                             blueActive.value, enable, gameViewModel::bluePressed)
-                    }
+                    }*/
 
 
                 }
