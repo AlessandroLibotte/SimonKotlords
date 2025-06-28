@@ -107,6 +107,8 @@ class GameViewModel @Inject constructor(
 
     fun countdown(){
 
+        _isPlayingSequence.value = true
+
         _playingSequenceJob = viewModelScope.launch {
             playSound(6)
             for (i in 3 downTo 1) {
@@ -167,6 +169,8 @@ class GameViewModel @Inject constructor(
         _bottomButtonCallback.value = ::startGame
 
         playSound(5)
+
+        if(score.value == 0) return
 
         viewModelScope.launch {
             repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
