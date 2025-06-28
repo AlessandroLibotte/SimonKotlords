@@ -1,5 +1,8 @@
 package com.example.simon_kotlords.ui.model
 
+import android.app.Application
+import android.media.AudioAttributes
+import android.media.SoundPool
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -18,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val repository: LeaderBoardRepository,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val application: Application
 ) : ViewModel(){
 
     private val _sequence = MutableLiveData<List<Int>>()
@@ -35,18 +39,6 @@ class GameViewModel @Inject constructor(
 
     private val _gameOver = MutableLiveData<Boolean>()
     val gameOver: LiveData<Boolean> = _gameOver
-
-    private val _redActive = MutableLiveData<Boolean>()
-    val redActive: LiveData<Boolean> = _redActive
-
-    private val _greenActive = MutableLiveData<Boolean>()
-    val greenActive: LiveData<Boolean> = _greenActive
-
-    private val _blueActive = MutableLiveData<Boolean>()
-    val blueActive: LiveData<Boolean> = _blueActive
-
-    private val _yellowActive = MutableLiveData<Boolean>()
-    val yellowActive: LiveData<Boolean> = _yellowActive
 
     private val _isPlayingSequence = MutableLiveData<Boolean>()
     val isPlayingSequence: LiveData<Boolean> = _isPlayingSequence
@@ -72,17 +64,35 @@ class GameViewModel @Inject constructor(
 
     private var _playingSequenceJob: Job? = null
 
+    private lateinit var soundPool: SoundPool
+    private var soundIds = mutableMapOf<Int, Int>()
+    private var soundsLoaded = mutableSetOf<Int>()
+
     init {
         _backgroundImage.value = R.drawable.game_logo_pause
         _topText.value = "When you are ready\npress Start!"
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
+
+        initializeSoundPool()
+        loadSound(1, R.raw.red_tone)
+        loadSound(2, R.raw.green_tone)
+        loadSound(3, R.raw.blue_tone)
+        loadSound(4, R.raw.yellow_tone)
+        loadSound(5, R.raw.gameover)
+        loadSound(6, R.raw.game_countdown)
+
+    }
+
+    fun enableButton(): Boolean{
+        return _isGameInProgress.value == true && _gameOver.value == false && _isPlayingSequence.value == false
     }
 
     fun startGame() {
 
         _isGameInProgress.value = true
         _gameOver.value = false
+        _isPlayingSequence.value = false
         _level.value = 1
         _score.value = 0
         _sequence.value = emptyList()
@@ -97,7 +107,10 @@ class GameViewModel @Inject constructor(
 
     fun countdown(){
 
+        _isPlayingSequence.value = true
+
         _playingSequenceJob = viewModelScope.launch {
+            playSound(6)
             for (i in 3 downTo 1) {
                 _topText.value = "Pay attention!\n$i..."
                 delay(1000L)
@@ -114,10 +127,6 @@ class GameViewModel @Inject constructor(
         _bottomButtonCallback.value = ::resumeGame
         _bottomButtonText.value = "Resume"
         _topText.value = "Game Paused"
-        _redActive.value = false
-        _greenActive.value = false
-        _blueActive.value = false
-        _yellowActive.value = false
         _backgroundImage.value = R.drawable.game_logo_pause
     }
 
@@ -159,6 +168,10 @@ class GameViewModel @Inject constructor(
         _bottomButtonText.value = "Start Game!"
         _bottomButtonCallback.value = ::startGame
 
+        playSound(5)
+
+        if(score.value == 0) return
+
         viewModelScope.launch {
             repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
         }
@@ -173,46 +186,97 @@ class GameViewModel @Inject constructor(
         _inputSequence.value = emptyList()
     }
 
-    fun redPressed()
-    {
+    private fun initializeSoundPool() {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME) // O USAGE_ASSISTANCE_SONIFICATION
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+
+        soundPool = SoundPool.Builder()
+            .setMaxStreams(4)
+            .setAudioAttributes(audioAttributes)
+            .build()
+
+        soundPool.setOnLoadCompleteListener { _, sampleId, status ->
+            if (status == 0) {
+                soundsLoaded.add(sampleId)
+            }
+        }
+    }
+
+    private fun loadSound(soundKey: Int, resourceId: Int) {
+        val soundId = soundPool.load(application.applicationContext, resourceId, 1)
+        soundIds[soundKey] = soundId
+    }
+
+    fun playSound(soundKey: Int) {
+        val soundIdToPlay = soundIds[soundKey]
+        if (soundIdToPlay != null && soundsLoaded.contains(soundIdToPlay)) {
+            soundPool.play(soundIdToPlay, 1.0f, 1.0f, 1, 0, 1.0f)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        soundPool.release()
+    }
+
+    fun redPressed() {
+        if(!enableButton()) return
+
         _inputSequence.value = inputSequence.value?.plus(1) ?: listOf(1)
         _backgroundImage.value = R.drawable.game_red_press
+        playSound(1)
     }
 
     fun redReleased(){
+        if(!enableButton()) return
+
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
-    fun greenPressed()
-    {
+    fun greenPressed() {
+        if(!enableButton()) return
+
         _inputSequence.value = inputSequence.value?.plus(2) ?: listOf(2)
         _backgroundImage.value = R.drawable.game_green_press
+        playSound(2)
     }
     fun greenReleased(){
+        if(!enableButton()) return
+
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
-    fun bluePressed()
-    {
+    fun bluePressed() {
+        if(!enableButton()) return
+
         _inputSequence.value = inputSequence.value?.plus(3) ?: listOf(3)
         _backgroundImage.value = R.drawable.game_blue_pressed
+        playSound(3)
     }
 
     fun blueReleased(){
+        if(!enableButton()) return
+
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
 
-    fun yellowPressed()
-    {
+    fun yellowPressed() {
+        if(!enableButton()) return
+
         _inputSequence.value = inputSequence.value?.plus(4) ?: listOf(4)
         _backgroundImage.value = R.drawable.game_yellow_press
+        playSound(4)
     }
 
     fun yellowReleased(){
+        if(!enableButton()) return
+
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
@@ -226,34 +290,30 @@ class GameViewModel @Inject constructor(
         for (color in sequence.value ?: emptyList()) {
             when (color) {
                 1 -> {
-                    _redActive.value = true
                     _backgroundImage.value = R.drawable.game_red_press
+                    playSound(1)
                     delay(calculatedDelay)
-                    _redActive.value = false
                     _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 2 -> {
-                    _greenActive.value = true
                     _backgroundImage.value = R.drawable.game_green_press
+                    playSound(2)
                     delay(calculatedDelay)
-                    _greenActive.value = false
                     _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 3 -> {
-                    _blueActive.value = true
                     _backgroundImage.value = R.drawable.game_blue_pressed
+                    playSound(3)
                     delay(calculatedDelay)
-                    _blueActive.value = false
                     _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }
                 4 -> {
-                    _yellowActive.value = true
                     _backgroundImage.value = R.drawable.game_yellow_press
+                    playSound(4)
                     delay(calculatedDelay)
-                    _yellowActive.value = false
                     _backgroundImage.value = R.drawable.game_play_icon
                     delay(calculatedDelay/2)
                 }

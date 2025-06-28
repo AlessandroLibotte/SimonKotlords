@@ -11,9 +11,6 @@ import javax.inject.Singleton
 @Singleton
 class LeaderBoardRepository @Inject constructor(private val highScoreDao: HighScoreDao){
 
-    //private val _highScores = MutableStateFlow<List<HighScoreEntity>>(emptyList())
-    //val highScores: Flow<List<HighScoreEntity>> = _highScores.asStateFlow()
-
     suspend fun addHighScore(date: LocalDate, level: Int, score: Int, difficulty: Int){
 
         val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyy")
@@ -22,8 +19,7 @@ class LeaderBoardRepository @Inject constructor(private val highScoreDao: HighSc
 
         val newHighScore = HighScoreEntity(date = dateStr, level = level, score = score, difficulty = difficulty)
 
-
-        insertHighScore(newHighScore)
+        highScoreDao.insertHighScore(newHighScore)
 
     }
 
@@ -31,8 +27,7 @@ class LeaderBoardRepository @Inject constructor(private val highScoreDao: HighSc
         return highScoreDao.getAllHighScores()
     }
 
-    suspend fun insertHighScore(highScore: HighScoreEntity) {
-        highScoreDao.insertHighScore(highScore)
+    suspend fun deleteHighScore(highScore: HighScoreEntity) {
+        highScoreDao.deleteHighScore(highScore)
     }
-
 }
