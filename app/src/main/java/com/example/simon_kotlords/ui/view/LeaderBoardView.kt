@@ -21,10 +21,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.simon_kotlords.R
 import com.example.simon_kotlords.data.model.HighScoreEntity
 import com.example.simon_kotlords.ui.model.LeaderBoardViewModel
 import java.time.format.DateTimeFormatter
@@ -52,7 +54,7 @@ fun LeaderBoardView(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No score found yet", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(id = R.string.noScores), style = MaterialTheme.typography.headlineSmall)
             }
 
         } else {
@@ -77,11 +79,13 @@ fun LeaderBoardView(
                         Icon(
                             modifier = Modifier.size(40.dp),
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "lower difficulty"
+                            contentDescription = "Lower difficulty"
                         )
                     }
                     Text(
-                        text = if (difficulty.intValue == 1) "Easy" else if (difficulty.intValue == 2) "Medium" else "Hard",
+                        text = if (difficulty.intValue == 1) stringResource(id = R.string.easy)
+                        else if (difficulty.intValue == 2) stringResource(id = R.string.medium)
+                        else stringResource(id = R.string.hard),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     IconButton(
@@ -94,7 +98,7 @@ fun LeaderBoardView(
                         Icon(
                             modifier = Modifier.size(40.dp),
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "higher difficulty"
+                            contentDescription = "Higher difficulty"
                         )
                     }
                 }
@@ -108,7 +112,7 @@ fun LeaderBoardView(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "No score found yet",
+                            stringResource(id = R.string.noScores),
                             style = MaterialTheme.typography.headlineSmall
                         )
                     }
@@ -183,7 +187,7 @@ fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modif
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "Score: ${highscore.score}",
+                text = "${stringResource(id = R.string.score)} ${highscore.score}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f)

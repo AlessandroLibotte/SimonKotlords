@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -150,7 +151,7 @@ fun TopBar(currentRoute: String?, navController: NavHostController) {
         else -> {
 
             Row(
-                modifier = Modifier.padding(top=16.dp),
+                modifier = Modifier.padding(top=20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -176,14 +177,14 @@ fun TopBar(currentRoute: String?, navController: NavHostController) {
 
                     AppDestinations.LEADERBOARD_ROUTE -> {
                         Text(
-                            text = "Leaderboard",
+                            text = stringResource(id = R.string.leaderboard),
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     }
 
                     AppDestinations.CREDITS_ROUTE -> {
                         Text(
-                            text = "Credits",
+                            text = stringResource(id = R.string.credits),
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     }

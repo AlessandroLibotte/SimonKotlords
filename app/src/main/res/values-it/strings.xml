@@ -1,0 +1,22 @@
+<resources>
+
+    <string name="app_name">Simon-Kotlords</string>
+    <string name="difficulty">Difficoltà</string>
+    <string name="easy">Facile</string>
+    <string name="medium">Media</string>
+    <string name="hard">Difficile</string>
+    <string name="play">Gioca</string>
+    <string name="leaderboard">Classifica</string>
+    <string name="credits">Crediti</string>
+    <string name="pregameMessage">Quando sei pronto\npremi Inizia!</string>
+    <string name="start">Inizia</string>
+    <string name="pause">Pausa</string>
+    <string name="resume">Riprendi</string>
+    <string name="payAttention">Fai attenzione!</string>
+    <string name="yourTurn">Adesso tocca a te!</string>
+    <string name="level">Livello:</string>
+    <string name="score">Punteggio:</string>
+    <string name="noScores">Nessun punteggio trovato.</string>
+    <string name="gameOver">Hai perso</string>
+    <string name="gamePaused">Gioco in pausa</string>
+</resources>

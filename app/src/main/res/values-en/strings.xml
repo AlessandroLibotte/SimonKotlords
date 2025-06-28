@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Simon-Kotlords</string>
     <string name="difficulty">Difficulty</string>
@@ -18,5 +19,4 @@
     <string name="noScores">No scores found yet.</string>
     <string name="gameOver">Game Over</string>
     <string name="gamePaused">Game Paused</string>
-
 </resources>

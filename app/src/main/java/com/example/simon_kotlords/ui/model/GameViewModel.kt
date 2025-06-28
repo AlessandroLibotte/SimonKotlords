@@ -50,11 +50,14 @@ class GameViewModel @Inject constructor(
 
     private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1)
 
-    private val _topText = MutableLiveData<String>()
-    val topText: LiveData<String> = _topText
+    private val _topTextId = MutableLiveData<Int>()
+    val topTextId: LiveData<Int> = _topTextId
 
-    private val _bottomButtonText = MutableLiveData<String>()
-    val bottomButtonText: LiveData<String> = _bottomButtonText
+    private val _countdownMsg = MutableLiveData<String>()
+    val countdownMsg: LiveData<String> = _countdownMsg
+
+    private val _bottomButtonTextId = MutableLiveData<Int>()
+    val bottomButtonTextId: LiveData<Int> = _bottomButtonTextId
 
     private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
     val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
@@ -70,8 +73,8 @@ class GameViewModel @Inject constructor(
 
     init {
         _backgroundImage.value = R.drawable.game_logo_pause
-        _topText.value = "When you are ready\npress Start!"
-        _bottomButtonText.value = "Start Game!"
+        _topTextId.value = R.string.pregameMessage
+        _bottomButtonTextId.value = R.string.start
         _bottomButtonCallback.value = ::startGame
 
         initializeSoundPool()
@@ -97,7 +100,7 @@ class GameViewModel @Inject constructor(
         _score.value = 0
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
-        _bottomButtonText.value = "Pause"
+        _bottomButtonTextId.value = R.string.pause
         _bottomButtonCallback.value = ::pauseGame
 
         updateSequence()
@@ -111,11 +114,12 @@ class GameViewModel @Inject constructor(
 
         _playingSequenceJob = viewModelScope.launch {
             playSound(6)
+            _topTextId.value = R.string.payAttention
             for (i in 3 downTo 1) {
-                _topText.value = "Pay attention!\n$i..."
+                _countdownMsg.value = "\n$i..."
                 delay(1000L)
             }
-
+            _countdownMsg.value = ""
             _backgroundImage.value = R.drawable.game_play_icon
             playSequence()
         }
@@ -125,13 +129,13 @@ class GameViewModel @Inject constructor(
     fun pauseGame() {
         _playingSequenceJob?.cancel()
         _bottomButtonCallback.value = ::resumeGame
-        _bottomButtonText.value = "Resume"
-        _topText.value = "Game Paused"
+        _bottomButtonTextId.value = R.string.resume
+        _topTextId.value = R.string.gamePaused
         _backgroundImage.value = R.drawable.game_logo_pause
     }
 
     fun resumeGame(){
-        _bottomButtonText.value = "Pause"
+        _bottomButtonTextId.value = R.string.pause
         _bottomButtonCallback.value = ::pauseGame
         countdown()
     }
@@ -164,8 +168,8 @@ class GameViewModel @Inject constructor(
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
-        _topText.value = "Game Over"
-        _bottomButtonText.value = "Start Game!"
+        _topTextId.value = R.string.gameOver
+        _bottomButtonTextId.value = R.string.start
         _bottomButtonCallback.value = ::startGame
 
         playSound(5)
@@ -284,7 +288,7 @@ class GameViewModel @Inject constructor(
     suspend fun playSequence() {
 
         _isPlayingSequence.value = true
-        _topText.value = "Pay attention!"
+        _topTextId.value = R.string.payAttention
         delay(1000)
 
         for (color in sequence.value ?: emptyList()) {
@@ -320,7 +324,7 @@ class GameViewModel @Inject constructor(
             }
         }
         _isPlayingSequence.value = false
-        _topText.value = "Now is your turn!"
+        _topTextId.value = R.string.yourTurn
 
     }
 

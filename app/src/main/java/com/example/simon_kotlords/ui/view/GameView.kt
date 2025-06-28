@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.simon_kotlords.R
@@ -40,8 +41,9 @@ fun GameView(
     val level = gameViewModel.level.observeAsState(1)
     val score = gameViewModel.score.observeAsState(0)
     val isGameInProgress = gameViewModel.isGameInProgress.observeAsState(false)
-    val topText = gameViewModel.topText.observeAsState("Pay attention!")
-    val bottomButtonText = gameViewModel.bottomButtonText.observeAsState("Start Game!")
+    val topText = gameViewModel.topTextId.observeAsState(R.string.payAttention)
+    val countdownMsg = gameViewModel.countdownMsg.observeAsState("")
+    val bottomButtonText = gameViewModel.bottomButtonTextId.observeAsState(R.string.start)
     val bottomButtonCallback = gameViewModel.bottomButtonCallback.observeAsState(gameViewModel::startGame)
     val backgroundImage = gameViewModel.backgroundImage.observeAsState(R.drawable.game_logo_pause)
 
@@ -59,8 +61,10 @@ fun GameView(
         ) {
 
             Text(
-                topText.value,
-                modifier = Modifier.padding(top = 30.dp).defaultMinSize(minHeight = 80.dp),
+                "${stringResource(topText.value)}${countdownMsg.value}",
+                modifier = Modifier
+                    .padding(top = 30.dp)
+                    .defaultMinSize(minHeight = 80.dp),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center
@@ -119,19 +123,19 @@ fun GameView(
                 if (isGameInProgress.value) {
 
                     Text(
-                        if (gameOver.value) "Game Over" else "",
+                        if (gameOver.value) stringResource(id = R.string.gameOver) else "",
                         modifier = Modifier.padding(bottom = 15.dp),
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Text(
-                        "Livello ${level.value}",
+                        "${stringResource(id = R.string.level)} ${level.value}",
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "Score: ${score.value}",
+                        "${stringResource(id = R.string.score)} ${score.value}",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 15.dp)
@@ -145,7 +149,7 @@ fun GameView(
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary),
                     enabled = (!isGameInProgress.value.and(!isPlayingSequence.value)).or(gameOver.value)
                 ) {
-                    Text(bottomButtonText.value)
+                    Text(stringResource(bottomButtonText.value))
                 }
 
             }
@@ -163,7 +167,7 @@ fun ArcButton(
     Box(
         modifier = Modifier
             .size(125.dp)
-            .pointerInput(Unit){
+            .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
                         onClick()

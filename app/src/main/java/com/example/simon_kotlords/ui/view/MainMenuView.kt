@@ -24,10 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.simon_kotlords.R
-import com.example.simon_kotlords.ui.theme.SimonKotlordsTheme
 
 @Composable
 fun MainMenuView(
@@ -81,7 +80,7 @@ fun MainMenuView(
             ) {
 
                 Text(
-                    text = "Difficulty:",
+                    text = stringResource(id = R.string.difficulty),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
@@ -99,11 +98,13 @@ fun MainMenuView(
                         Icon(
                             modifier = Modifier.size(40.dp),
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go back"
+                            contentDescription = "Lower difficulty"
                         )
                     }
                     Text(
-                        text= if(difficulty.intValue == 1) "Easy" else if(difficulty.intValue == 2) "Medium" else "Hard",
+                        text= if(difficulty.intValue == 1) stringResource(id = R.string.easy)
+                        else if(difficulty.intValue == 2) stringResource(id = R.string.medium)
+                        else stringResource(id = R.string.hard),
                         style = MaterialTheme.typography.headlineSmall
                     )
                     IconButton(
@@ -116,7 +117,7 @@ fun MainMenuView(
                         Icon(
                             modifier = Modifier.size(40.dp),
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Go back"
+                            contentDescription = "Higher difficulty"
                         )
                     }
                 }
@@ -126,7 +127,7 @@ fun MainMenuView(
                     modifier = Modifier.widthIn(min = 200.dp),
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
                 ) {
-                    Text(text = "Play")
+                    Text(text = stringResource(id = R.string.play))
                 }
 
                 Button(
@@ -134,7 +135,7 @@ fun MainMenuView(
                     modifier = Modifier.widthIn(min = 200.dp),
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
                 ) {
-                    Text(text = "Leaderboard")
+                    Text(text = stringResource(id = R.string.leaderboard))
                 }
 
                 Button(
@@ -142,20 +143,10 @@ fun MainMenuView(
                     modifier = Modifier.widthIn(min = 200.dp),
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.onPrimary)
                 ) {
-                    Text(text = "Credits")
+                    Text(text = stringResource(id = R.string.credits))
                 }
             }
 
         }
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SimonKotlordsTheme {
-        //MainMenuView(onPlayClicked = {Log.d("Preview" ,"Play clicked")},onCreditsClicked = {Log.d("Preview" ,"Credits clicked")},onHighlightsClicked = {Log.d("Preview" ,"Highlights clicked")})
     }
 }
