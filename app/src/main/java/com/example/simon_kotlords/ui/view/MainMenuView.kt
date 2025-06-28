@@ -39,7 +39,7 @@ fun MainMenuView(
     modifier: Modifier = Modifier
 ) {
 
-    var difficulty = remember { mutableIntStateOf(currentDifficulty) }
+    val difficulty = remember { mutableIntStateOf(currentDifficulty) }
 
     Surface(
         modifier = modifier.fillMaxSize(),

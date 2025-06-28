@@ -99,7 +99,7 @@ fun Content() {
                     slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Up, animationSpec = tween(300))
                 }
             ) {
-                MainMenuView(
+                 MainMenuView(
                     currentDifficulty = rememberedDifficulty,
                     onPlayClicked = {difficulty -> navController.navigate("${AppDestinations.PLAY_GAME_ROUTE}/$difficulty") },
                     onDifficultyChanged = { newDifficulty -> rememberedDifficulty = newDifficulty },

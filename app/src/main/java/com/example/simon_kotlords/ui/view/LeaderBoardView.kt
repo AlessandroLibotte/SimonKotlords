@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -124,7 +125,8 @@ fun LeaderBoardView(
 
                             HighscoreItemView(
                                 highscore = highscore,
-                                position = i+1
+                                position = i+1,
+                                deleteHighscore = { leaderBoardViewModel.deleteHighscore(highscore) }
                             )
 
                             if (i < leaderBoardSubList.lastIndex) {
@@ -146,7 +148,7 @@ fun LeaderBoardView(
 }
 
 @Composable
-fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modifier = Modifier) {
+fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modifier = Modifier, deleteHighscore: () -> Unit = {}) {
 
     val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyy")
 
@@ -186,6 +188,16 @@ fun HighscoreItemView(highscore: HighScoreEntity, position: Int, modifier: Modif
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f)
             )
+            IconButton(
+                modifier = Modifier.weight(1f).size(20.dp),
+                onClick = { deleteHighscore() }
+            ) {
+                Icon(
+                    tint = MaterialTheme.colorScheme.primary,
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Delete Highscore",
+                )
+            }
         }
     }
 }
