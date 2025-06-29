@@ -19,4 +19,6 @@
     <string name="noScores">Nessun punteggio trovato.</string>
     <string name="gameOver">Hai perso</string>
     <string name="gamePaused">Gioco in pausa</string>
+    <string name="creditsMsg">Gioco sviluppato da Kotlordsq\nquesta applicazione è stata programmata\ne progettata da due studenti\nSimone Ferretti e Alessandro Libotte\ndalla Università di Roma: Uniroma2 Torvergata</string>
+    <string name="version">Versione</string>
 </resources>

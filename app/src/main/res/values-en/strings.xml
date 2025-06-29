@@ -19,4 +19,6 @@
     <string name="noScores">No scores found yet.</string>
     <string name="gameOver">Game Over</string>
     <string name="gamePaused">Game Paused</string>
+    <string name="creditsMsg">Game Developed by Kotlords\nThis application was programmed and designed by two students\nSimone Ferretti and Alessandro Libotte\nfrom the University of Rome: Uniroma2 Torvergata</string>
+    <string name="version">Version</string>
 </resources>

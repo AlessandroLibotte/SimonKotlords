@@ -174,7 +174,7 @@ class GameViewModel @Inject constructor(
 
         playSound(5)
 
-        if(score.value == 0) return
+        if(score.value == 0 || score.value!! >= 999) return
 
         viewModelScope.launch {
             repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
