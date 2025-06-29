@@ -1,12 +1,12 @@
 ﻿
 # SIMON  by KotLords
-Simon is an application that aims to recreate the famous game Simon Says, and was developed by Simone Ferretti and Alessandro Libotte for educational purposes, a user manual is available in the main repository, we recommend comparing it if you want to understand the design choices
+Simon is an application that aims to recreate the famous game Simon Says, and was developed by Simone Ferretti and Alessandro Libotte for educational purposes, a user manual is available in the main repository, we recommend consulting it if you want to understand the design choices
 
 ## Main features
 
  - Simple and minimalist interface to ensure a pleasant experience
- - Random color pattern generation to make the challenge arduous
- - Difficulty selector to make it appreciable for everyone
+ - Random color pattern generation to make the challenge always unique
+ - Difficulty selector if you need an harder challenge
  - Storing personal records to always strive for improvement
 ## Installation guide
  - Clone the current [repository](https://github.com/AlessandroLibotte/SimonKotlords/tree/master)
@@ -24,10 +24,10 @@ Simon is an application that aims to recreate the famous game Simon Says, and wa
 
 
 ## How to get started
- - click play to go in the  Play Screen
+ - click play to go into the Play Screen
  - click start to start your game
- - while the sequence is shown you can click pause
- - repeat the sequence seen
+ - while the sequence is being shown you can pause the game, dont warry the sequence will be repeated form the start
+ - repeat the sequence you have seen
  - advance through the levels as long as you can
  - once you lose check your record in the leaderboard section
 ## Credits
