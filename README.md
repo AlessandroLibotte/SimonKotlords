@@ -15,7 +15,7 @@ Simon is an application that aims to recreate the famous game Simon Says, and wa
 ## minimum Requirments 
  - Android Sdk 28
 
-## How it looks
+## How does it look
 <img src="https://github.com/AlessandroLibotte/SimonKotlords/blob/master/ReadMeImage/HomeScreen.jpg?raw=true" alt="HomeScreen" width="300"/>
 <img src="https://github.com/AlessandroLibotte/SimonKotlords/blob/master/ReadMeImage/PlayScreen1.png?raw=true" alt="PlayScreen1" alt="PlayScreen1" width="300"/> 
 <img src="https://github.com/AlessandroLibotte/SimonKotlords/blob/master/ReadMeImage/PlayScreen2.jpg?raw=true" alt="PlayScreen2" width="300"/>
