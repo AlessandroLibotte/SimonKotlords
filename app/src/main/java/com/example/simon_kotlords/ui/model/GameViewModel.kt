@@ -1,82 +1,71 @@
-package com.example.simon_kotlords.ui.model
+Certo, Simone! Ecco una versione commentata del tuo `GameViewModel`, con spiegazioni dettagliate per aiutarti a comprendere ogni parte del codice:
 
-import android.app.Application
-import android.media.AudioAttributes
-import android.media.SoundPool
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.simon_kotlords.AppDestinations
-import com.example.simon_kotlords.R
-import com.example.simon_kotlords.data.repository.LeaderBoardRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import javax.inject.Inject
-
+```kotlin
+// ViewModel per gestire la logica del gioco Simon
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val repository: LeaderBoardRepository,
-    savedStateHandle: SavedStateHandle,
-    private val application: Application
-) : ViewModel(){
+    private val repository: LeaderBoardRepository, // Repository per salvare i punteggi
+    savedStateHandle: SavedStateHandle, // Per recuperare argomenti salvati (es. difficoltà)
+    private val application: Application // Necessario per accedere alle risorse (es. suoni)
+) : ViewModel() {
 
-    private val _sequence = MutableLiveData<List<Int>>()
+    // LiveData per tracciare lo stato del gioco
+    private val _sequence = MutableLiveData<List<Int>>() // Sequenza da riprodurre
     val sequence: LiveData<List<Int>> = _sequence
 
-    private val _inputSequence = MutableLiveData<List<Int>>()
+    private val _inputSequence = MutableLiveData<List<Int>>() // Input dell'utente
     val inputSequence: LiveData<List<Int>> = _inputSequence
 
-    private val _level = MutableLiveData<Int>()
+    private val _level = MutableLiveData<Int>() // Livello corrente
     val level: LiveData<Int> = _level
 
-    private val _score = MutableLiveData<Int>()
+    private val _score = MutableLiveData<Int>() // Punteggio corrente
     val score: LiveData<Int> = _score
 
-    private val _gameOver = MutableLiveData<Boolean>()
+    private val _gameOver = MutableLiveData<Boolean>() // Stato di game over
     val gameOver: LiveData<Boolean> = _gameOver
 
-    private val _isPlayingSequence = MutableLiveData<Boolean>()
+    private val _isPlayingSequence = MutableLiveData<Boolean>() // Se la sequenza è in riproduzione
     val isPlayingSequence: LiveData<Boolean> = _isPlayingSequence
 
-    private val _isGameInProgress = MutableLiveData<Boolean>()
+    private val _isGameInProgress = MutableLiveData<Boolean>() // Se il gioco è attivo
     val isGameInProgress: LiveData<Boolean> = _isGameInProgress
 
+    // Recupera la difficoltà dal SavedStateHandle
     private val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
+    private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1) // Delay basato sulla difficoltà
 
-    private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1)
-
-    private val _topTextId = MutableLiveData<Int>()
+    // UI-related LiveData
+    private val _topTextId = MutableLiveData<Int>() // Testo superiore (es. "Attenzione")
     val topTextId: LiveData<Int> = _topTextId
 
-    private val _countdownMsg = MutableLiveData<String>()
+    private val _countdownMsg = MutableLiveData<String>() // Messaggio countdown
     val countdownMsg: LiveData<String> = _countdownMsg
 
-    private val _bottomButtonTextId = MutableLiveData<Int>()
+    private val _bottomButtonTextId = MutableLiveData<Int>() // Testo bottone inferiore
     val bottomButtonTextId: LiveData<Int> = _bottomButtonTextId
 
-    private val _bottomButtonCallback = MutableLiveData<() -> Unit>()
+    private val _bottomButtonCallback = MutableLiveData<() -> Unit>() // Callback bottone inferiore
     val bottomButtonCallback: LiveData<() -> Unit> = _bottomButtonCallback
 
-    private val _backgroundImage = MutableLiveData<Int>()
+    private val _backgroundImage = MutableLiveData<Int>() // Immagine di sfondo
     val backgroundImage: LiveData<Int> = _backgroundImage
 
-    private var _playingSequenceJob: Job? = null
+    private var _playingSequenceJob: Job? = null // Job per la sequenza in corso
 
+    // Gestione suoni
     private lateinit var soundPool: SoundPool
-    private var soundIds = mutableMapOf<Int, Int>()
-    private var soundsLoaded = mutableSetOf<Int>()
+    private var soundIds = mutableMapOf<Int, Int>() // Mappa ID suoni
+    private var soundsLoaded = mutableSetOf<Int>() // Suoni caricati
 
     init {
+        // Stato iniziale UI
         _backgroundImage.value = R.drawable.game_logo_pause
         _topTextId.value = R.string.pregameMessage
         _bottomButtonTextId.value = R.string.start
         _bottomButtonCallback.value = ::startGame
 
+        // Inizializza suoni
         initializeSoundPool()
         loadSound(1, R.raw.red_tone)
         loadSound(2, R.raw.green_tone)
@@ -84,15 +73,15 @@ class GameViewModel @Inject constructor(
         loadSound(4, R.raw.yellow_tone)
         loadSound(5, R.raw.gameover)
         loadSound(6, R.raw.game_countdown)
-
     }
 
-    fun enableButton(): Boolean{
+    // Controlla se i pulsanti sono abilitati
+    fun enableButton(): Boolean {
         return _isGameInProgress.value == true && _gameOver.value == false && _isPlayingSequence.value == false
     }
 
+    // Avvia una nuova partita
     fun startGame() {
-
         _isGameInProgress.value = true
         _gameOver.value = false
         _isPlayingSequence.value = false
@@ -104,14 +93,12 @@ class GameViewModel @Inject constructor(
         _bottomButtonCallback.value = ::pauseGame
 
         updateSequence()
-
         countdown()
     }
 
-    fun countdown(){
-
+    // Countdown prima della sequenza
+    fun countdown() {
         _isPlayingSequence.value = true
-
         _playingSequenceJob = viewModelScope.launch {
             playSound(6)
             _topTextId.value = R.string.payAttention
@@ -123,9 +110,9 @@ class GameViewModel @Inject constructor(
             _backgroundImage.value = R.drawable.game_play_icon
             playSequence()
         }
-
     }
 
+    // Pausa il gioco
     fun pauseGame() {
         _playingSequenceJob?.cancel()
         _bottomButtonCallback.value = ::resumeGame
@@ -134,23 +121,25 @@ class GameViewModel @Inject constructor(
         _backgroundImage.value = R.drawable.game_logo_pause
     }
 
-    fun resumeGame(){
+    // Riprende il gioco
+    fun resumeGame() {
         _bottomButtonTextId.value = R.string.pause
         _bottomButtonCallback.value = ::pauseGame
         countdown()
     }
 
+    // Aggiunge un nuovo colore alla sequenza
     fun updateSequence() {
         var newSequence = sequence.value ?: emptyList()
         newSequence = newSequence + (1..4).random()
         _sequence.value = newSequence
     }
 
+    // Controlla se l'input dell'utente è corretto
     fun checkSequence() {
-
         if (inputSequence.value.isNullOrEmpty() || sequence.value.isNullOrEmpty()) return
 
-        if(inputSequence.value!![inputSequence.value!!.lastIndex] != sequence.value!![inputSequence.value!!.lastIndex]) {
+        if (inputSequence.value!!.last() != sequence.value!!.get(inputSequence.value!!.lastIndex)) {
             gameOver()
             return
         }
@@ -160,11 +149,10 @@ class GameViewModel @Inject constructor(
         if (inputSequence.value!!.size == sequence.value!!.size) {
             nexLevel()
         }
-
     }
 
-    fun gameOver(){
-
+    // Gestisce il game over
+    fun gameOver() {
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
@@ -174,14 +162,15 @@ class GameViewModel @Inject constructor(
 
         playSound(5)
 
-        if(score.value == 0 || score.value!! >= 999) return
+        if (score.value == 0 || score.value!! >= 999) return
 
         viewModelScope.launch {
             repository.addHighScore(LocalDate.now(), level.value ?: 1, score.value ?: 0, difficulty)
         }
     }
 
-    fun nexLevel(){
+    // Passa al livello successivo
+    fun nexLevel() {
         _level.value = (level.value ?: 0) + 1
         updateSequence()
         _playingSequenceJob = viewModelScope.launch {
@@ -190,9 +179,10 @@ class GameViewModel @Inject constructor(
         _inputSequence.value = emptyList()
     }
 
+    // Inizializza il SoundPool
     private fun initializeSoundPool() {
         val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME) // O USAGE_ASSISTANCE_SONIFICATION
+            .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
 
@@ -208,11 +198,13 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    // Carica un suono
     private fun loadSound(soundKey: Int, resourceId: Int) {
         val soundId = soundPool.load(application.applicationContext, resourceId, 1)
         soundIds[soundKey] = soundId
     }
 
+    // Riproduce un suono
     fun playSound(soundKey: Int) {
         val soundIdToPlay = soundIds[soundKey]
         if (soundIdToPlay != null && soundsLoaded.contains(soundIdToPlay)) {
@@ -220,32 +212,31 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    // Rilascia le risorse audio
     override fun onCleared() {
         super.onCleared()
         soundPool.release()
     }
 
+    // Gestione di pressione e rilascio pulsanti colorati
     fun redPressed() {
-        if(!enableButton()) return
-
+        if (!enableButton()) return
         _inputSequence.value = inputSequence.value?.plus(1) ?: listOf(1)
         _backgroundImage.value = R.drawable.game_red_press
         playSound(1)
     }
 
-    fun redReleased(){
-        if(!enableButton()) return
-
+    fun redReleased() {
+        if (!enableButton()) return
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
     fun greenPressed() {
-        if(!enableButton()) return
-
+        if (!enableButton()) return
         _inputSequence.value = inputSequence.value?.plus(2) ?: listOf(2)
         _backgroundImage.value = R.drawable.game_green_press
-        playSound(2)
+        play
     }
     fun greenReleased(){
         if(!enableButton()) return
@@ -285,47 +276,54 @@ class GameViewModel @Inject constructor(
         checkSequence()
     }
 
-    suspend fun playSequence() {
+    // Funzione sospesa che riproduce la sequenza di colori da imitare
+suspend fun playSequence() {
 
-        _isPlayingSequence.value = true
-        _topTextId.value = R.string.payAttention
-        delay(1000)
+    // Imposta lo stato per indicare che la sequenza è in riproduzione
+    _isPlayingSequence.value = true
 
-        for (color in sequence.value ?: emptyList()) {
-            when (color) {
-                1 -> {
-                    _backgroundImage.value = R.drawable.game_red_press
-                    playSound(1)
-                    delay(calculatedDelay)
-                    _backgroundImage.value = R.drawable.game_play_icon
-                    delay(calculatedDelay/2)
-                }
-                2 -> {
-                    _backgroundImage.value = R.drawable.game_green_press
-                    playSound(2)
-                    delay(calculatedDelay)
-                    _backgroundImage.value = R.drawable.game_play_icon
-                    delay(calculatedDelay/2)
-                }
-                3 -> {
-                    _backgroundImage.value = R.drawable.game_blue_pressed
-                    playSound(3)
-                    delay(calculatedDelay)
-                    _backgroundImage.value = R.drawable.game_play_icon
-                    delay(calculatedDelay/2)
-                }
-                4 -> {
-                    _backgroundImage.value = R.drawable.game_yellow_press
-                    playSound(4)
-                    delay(calculatedDelay)
-                    _backgroundImage.value = R.drawable.game_play_icon
-                    delay(calculatedDelay/2)
-                }
+    // Aggiorna il testo superiore per avvisare l'utente di prestare attenzione
+    _topTextId.value = R.string.payAttention
+
+    // Attende un secondo prima di iniziare la sequenza
+    delay(1000)
+
+    // Itera su ogni colore nella sequenza da riprodurre
+    for (color in sequence.value ?: emptyList()) {
+        when (color) {
+            1 -> {
+                // Mostra il pulsante rosso premuto e riproduce il suono corrispondente
+                _backgroundImage.value = R.drawable.game_red_press
+                playSound(1)
+                delay(calculatedDelay) // Attende per la durata calcolata
+                _backgroundImage.value = R.drawable.game_play_icon // Ripristina l'immagine di gioco
+                delay(calculatedDelay / 2) // Breve pausa tra i colori
+            }
+            2 -> {
+                _backgroundImage.value = R.drawable.game_green_press
+                playSound(2)
+                delay(calculatedDelay)
+                _backgroundImage.value = R.drawable.game_play_icon
+                delay(calculatedDelay / 2)
+            }
+            3 -> {
+                _backgroundImage.value = R.drawable.game_blue_pressed
+                playSound(3)
+                delay(calculatedDelay)
+                _backgroundImage.value = R.drawable.game_play_icon
+                delay(calculatedDelay / 2)
+            }
+            4 -> {
+                _backgroundImage.value = R.drawable.game_yellow_press
+                playSound(4)
+                delay(calculatedDelay)
+                _backgroundImage.value = R.drawable.game_play_icon
+                delay(calculatedDelay / 2)
             }
         }
-        _isPlayingSequence.value = false
-        _topTextId.value = R.string.yourTurn
-
     }
 
+    // Fine della sequenza: l'utente può ora iniziare a replicarla
+    _isPlayingSequence.value = false
+    _topTextId.value = R.string.yourTurn
 }
