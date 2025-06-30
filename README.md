@@ -26,7 +26,7 @@ Simon is an application that aims to recreate the famous game Simon Says, and wa
 ## How to get started
  - click play to go into the Play Screen
  - click start to start your game
- - while the sequence is being shown you can pause the game, dont warry the sequence will be repeated form the start
+ - while the sequence is being shown you can pause the game, don't worry the sequence will be repeated from the start
  - repeat the sequence you have seen
  - advance through the levels as long as you can
  - once you lose check your record in the leaderboard section
