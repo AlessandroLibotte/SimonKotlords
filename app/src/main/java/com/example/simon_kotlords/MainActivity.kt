@@ -32,7 +32,7 @@ object AppDestinations {
     const val LEADERBOARD_ROUTE = "leaderboard"
     const val CREDITS_ROUTE = "credits"
     const val DIFFICULTY_ARG = "difficulty"
-    val playGameRouteWithArg = "$PLAY_GAME_ROUTE/{$DIFFICULTY_ARG}"
+    const val PLAY_GAME_ARG_ROUTE = "$PLAY_GAME_ROUTE/{$DIFFICULTY_ARG}"
 }
 
 @AndroidEntryPoint
@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                 Content() // Composable principale
             }
         }
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     }
 }
 
@@ -96,7 +97,7 @@ fun Content() {
 
             // Schermata di gioco con parametro di difficoltà
             composable(
-                route = AppDestinations.playGameRouteWithArg,
+                route = AppDestinations.PLAY_GAME_ARG_ROUTE,
                 arguments = listOf(navArgument(AppDestinations.DIFFICULTY_ARG) {
                     type = NavType.IntType
                     defaultValue = 1

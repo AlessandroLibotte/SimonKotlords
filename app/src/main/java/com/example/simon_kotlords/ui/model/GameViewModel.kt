@@ -94,7 +94,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Controlla se i pulsanti sono abilitati
-    fun enableButton(): Boolean {
+    private fun enableButton(): Boolean {
         return _isGameInProgress.value == true && _gameOver.value == false && _isPlayingSequence.value == false
     }
 
@@ -115,7 +115,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Countdown prima della sequenza
-    fun countdown() {
+    private fun countdown() {
         _isPlayingSequence.value = true
         _playingSequenceJob = viewModelScope.launch {
             playSound(6)
@@ -147,17 +147,17 @@ class GameViewModel @Inject constructor(
     }
 
     // Aggiunge un nuovo colore alla sequenza
-    fun updateSequence() {
+    private fun updateSequence() {
         var newSequence = sequence.value ?: emptyList()
         newSequence = newSequence + (1..4).random()
         _sequence.value = newSequence
     }
 
     // Controlla se l'input dell'utente è corretto
-    fun checkSequence() {
+    private fun checkSequence() {
         if (inputSequence.value.isNullOrEmpty() || sequence.value.isNullOrEmpty()) return
 
-        if (inputSequence.value!!.last() != sequence.value!!.get(inputSequence.value!!.lastIndex)) {
+        if (inputSequence.value!!.last() != sequence.value!![inputSequence.value!!.lastIndex]) {
             gameOver()
             return
         }
@@ -170,7 +170,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Gestisce il game over
-    fun gameOver() {
+    private fun gameOver() {
         _sequence.value = emptyList()
         _inputSequence.value = emptyList()
         _gameOver.value = true
@@ -188,7 +188,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Passa al livello successivo
-    fun nexLevel() {
+    private fun nexLevel() {
         _level.value = (level.value ?: 0) + 1
         updateSequence()
         _playingSequenceJob = viewModelScope.launch {
@@ -223,7 +223,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Riproduce un suono
-    fun playSound(soundKey: Int) {
+    private fun playSound(soundKey: Int) {
         val soundIdToPlay = soundIds[soundKey]
         if (soundIdToPlay != null && soundsLoaded.contains(soundIdToPlay)) {
             soundPool.play(soundIdToPlay, 1.0f, 1.0f, 1, 0, 1.0f)
@@ -296,7 +296,7 @@ class GameViewModel @Inject constructor(
     }
 
     // Funzione sospesa che riproduce la sequenza di colori da imitare
-    suspend fun playSequence() {
+    private suspend fun playSequence() {
 
         // Imposta lo stato per indicare che la sequenza è in riproduzione
         _isPlayingSequence.value = true
