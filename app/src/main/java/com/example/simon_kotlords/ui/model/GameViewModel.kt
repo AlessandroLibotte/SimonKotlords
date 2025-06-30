@@ -1,6 +1,23 @@
-Certo, Simone! Ecco una versione commentata del tuo `GameViewModel`, con spiegazioni dettagliate per aiutarti a comprendere ogni parte del codice:
+package com.example.simon_kotlords.ui.model
 
-```kotlin
+import android.app.Application
+import android.media.AudioAttributes
+import android.media.SoundPool
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.simon_kotlords.AppDestinations
+import com.example.simon_kotlords.R
+import com.example.simon_kotlords.data.repository.LeaderBoardRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import javax.inject.Inject
+
 // ViewModel per gestire la logica del gioco Simon
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -33,7 +50,8 @@ class GameViewModel @Inject constructor(
 
     // Recupera la difficoltà dal SavedStateHandle
     private val difficulty: Int = savedStateHandle.get<Int>(AppDestinations.DIFFICULTY_ARG) ?: 1
-    private val calculatedDelay: Long = 1000L / difficulty.toLong().coerceAtLeast(1) // Delay basato sulla difficoltà
+    private val calculatedDelay: Long =
+        1000L / difficulty.toLong().coerceAtLeast(1) // Delay basato sulla difficoltà
 
     // UI-related LiveData
     private val _topTextId = MutableLiveData<Int>() // Testo superiore (es. "Attenzione")
@@ -236,25 +254,26 @@ class GameViewModel @Inject constructor(
         if (!enableButton()) return
         _inputSequence.value = inputSequence.value?.plus(2) ?: listOf(2)
         _backgroundImage.value = R.drawable.game_green_press
-        play
+        playSound(2)
     }
-    fun greenReleased(){
-        if(!enableButton()) return
+
+    fun greenReleased() {
+        if (!enableButton()) return
 
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
     fun bluePressed() {
-        if(!enableButton()) return
+        if (!enableButton()) return
 
         _inputSequence.value = inputSequence.value?.plus(3) ?: listOf(3)
         _backgroundImage.value = R.drawable.game_blue_pressed
         playSound(3)
     }
 
-    fun blueReleased(){
-        if(!enableButton()) return
+    fun blueReleased() {
+        if (!enableButton()) return
 
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
@@ -262,68 +281,73 @@ class GameViewModel @Inject constructor(
 
 
     fun yellowPressed() {
-        if(!enableButton()) return
+        if (!enableButton()) return
 
         _inputSequence.value = inputSequence.value?.plus(4) ?: listOf(4)
         _backgroundImage.value = R.drawable.game_yellow_press
         playSound(4)
     }
 
-    fun yellowReleased(){
-        if(!enableButton()) return
+    fun yellowReleased() {
+        if (!enableButton()) return
 
         _backgroundImage.value = R.drawable.game_play_icon
         checkSequence()
     }
 
     // Funzione sospesa che riproduce la sequenza di colori da imitare
-suspend fun playSequence() {
+    suspend fun playSequence() {
 
-    // Imposta lo stato per indicare che la sequenza è in riproduzione
-    _isPlayingSequence.value = true
+        // Imposta lo stato per indicare che la sequenza è in riproduzione
+        _isPlayingSequence.value = true
 
-    // Aggiorna il testo superiore per avvisare l'utente di prestare attenzione
-    _topTextId.value = R.string.payAttention
+        // Aggiorna il testo superiore per avvisare l'utente di prestare attenzione
+        _topTextId.value = R.string.payAttention
 
-    // Attende un secondo prima di iniziare la sequenza
-    delay(1000)
+        // Attende un secondo prima di iniziare la sequenza
+        delay(1000)
 
-    // Itera su ogni colore nella sequenza da riprodurre
-    for (color in sequence.value ?: emptyList()) {
-        when (color) {
-            1 -> {
-                // Mostra il pulsante rosso premuto e riproduce il suono corrispondente
-                _backgroundImage.value = R.drawable.game_red_press
-                playSound(1)
-                delay(calculatedDelay) // Attende per la durata calcolata
-                _backgroundImage.value = R.drawable.game_play_icon // Ripristina l'immagine di gioco
-                delay(calculatedDelay / 2) // Breve pausa tra i colori
-            }
-            2 -> {
-                _backgroundImage.value = R.drawable.game_green_press
-                playSound(2)
-                delay(calculatedDelay)
-                _backgroundImage.value = R.drawable.game_play_icon
-                delay(calculatedDelay / 2)
-            }
-            3 -> {
-                _backgroundImage.value = R.drawable.game_blue_pressed
-                playSound(3)
-                delay(calculatedDelay)
-                _backgroundImage.value = R.drawable.game_play_icon
-                delay(calculatedDelay / 2)
-            }
-            4 -> {
-                _backgroundImage.value = R.drawable.game_yellow_press
-                playSound(4)
-                delay(calculatedDelay)
-                _backgroundImage.value = R.drawable.game_play_icon
-                delay(calculatedDelay / 2)
+        // Itera su ogni colore nella sequenza da riprodurre
+        for (color in sequence.value ?: emptyList()) {
+            when (color) {
+                1 -> {
+                    // Mostra il pulsante rosso premuto e riproduce il suono corrispondente
+                    _backgroundImage.value = R.drawable.game_red_press
+                    playSound(1)
+                    delay(calculatedDelay) // Attende per la durata calcolata
+                    _backgroundImage.value =
+                        R.drawable.game_play_icon // Ripristina l'immagine di gioco
+                    delay(calculatedDelay / 2) // Breve pausa tra i colori
+                }
+
+                2 -> {
+                    _backgroundImage.value = R.drawable.game_green_press
+                    playSound(2)
+                    delay(calculatedDelay)
+                    _backgroundImage.value = R.drawable.game_play_icon
+                    delay(calculatedDelay / 2)
+                }
+
+                3 -> {
+                    _backgroundImage.value = R.drawable.game_blue_pressed
+                    playSound(3)
+                    delay(calculatedDelay)
+                    _backgroundImage.value = R.drawable.game_play_icon
+                    delay(calculatedDelay / 2)
+                }
+
+                4 -> {
+                    _backgroundImage.value = R.drawable.game_yellow_press
+                    playSound(4)
+                    delay(calculatedDelay)
+                    _backgroundImage.value = R.drawable.game_play_icon
+                    delay(calculatedDelay / 2)
+                }
             }
         }
-    }
 
-    // Fine della sequenza: l'utente può ora iniziare a replicarla
-    _isPlayingSequence.value = false
-    _topTextId.value = R.string.yourTurn
+        // Fine della sequenza: l'utente può ora iniziare a replicarla
+        _isPlayingSequence.value = false
+        _topTextId.value = R.string.yourTurn
+    }
 }

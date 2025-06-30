@@ -98,9 +98,11 @@ fun MainMenuView(
 
                     // Testo che mostra la difficoltà attuale
                     Text(
-                        text = if (difficulty.intValue == 1) stringResource(id = R.string.easy)
-                        else if (difficulty.intValue == 2) stringResource(id = R.string.medium)
-                        else stringResource(id = R.string.hard),
+                        text = when (difficulty.intValue) {
+                            1 -> stringResource(id = R.string.easy)
+                            2 -> stringResource(id = R.string.medium)
+                            else -> stringResource(id = R.string.hard)
+                        },
                         style = MaterialTheme.typography.headlineSmall
                     )
 
