@@ -7,5 +7,7 @@ import com.example.simon_kotlords.data.model.HighScoreEntity
 
 @Database(entities = [HighScoreEntity::class], version = 1,exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
+
+    // Metodo astratto che fornisce l'accesso al DAO dei punteggi
     abstract fun highScoreDao(): HighScoreDao
 }
